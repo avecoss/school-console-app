@@ -1,0 +1,7 @@
+to print student by ID
+to find all groups with less or equal students’ number
+to find all students related to the course with the given name
+to add a new student
+to delete a student by ID
+to add a student to the course (from a list)
+to remove the student from one of their courses
