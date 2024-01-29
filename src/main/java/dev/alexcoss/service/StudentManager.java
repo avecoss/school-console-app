@@ -4,15 +4,19 @@ import dev.alexcoss.dao.GroupDao;
 import dev.alexcoss.dao.StudentDao;
 import dev.alexcoss.model.Group;
 import dev.alexcoss.model.Student;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class StudentManager {
     private final StudentDao studentDao;
     private final GroupRandomizer groupRandomizer;
     private final StudentGenerator studentGenerator;
     private final GroupDao groupDao;
 
+    @Autowired
     public StudentManager(StudentDao studentDao, GroupRandomizer groupRandomizer,
                           StudentGenerator studentGenerator, GroupDao groupDao) {
 

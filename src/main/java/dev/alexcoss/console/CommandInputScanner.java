@@ -5,9 +5,15 @@ import dev.alexcoss.dao.CourseDao;
 import dev.alexcoss.dao.GroupDao;
 import dev.alexcoss.dao.StudentDao;
 import dev.alexcoss.dao.StudentsCoursesDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
+@Component
 public class CommandInputScanner {
     private static final String EXIT_COMMAND = "exit";
 
@@ -17,6 +23,7 @@ public class CommandInputScanner {
     private final StudentsCoursesDao studentsCoursesDao;
     private final Map<Integer, Action> actions = new HashMap<>();
 
+    @Autowired
     public CommandInputScanner(StudentDao studentDao, GroupDao groupDao, CourseDao courseDao, StudentsCoursesDao studentsCoursesDao) {
         this.studentDao = studentDao;
         this.groupDao = groupDao;

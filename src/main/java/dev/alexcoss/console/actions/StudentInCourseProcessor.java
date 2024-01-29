@@ -26,6 +26,16 @@ public class StudentInCourseProcessor {
             Student student = inputScanner.getStudentDao().getStudentById(studentId);
             Course course = findCourseByName(inputCourseName, courses);
 
+            if (student == null) {
+                System.out.println("Student not found. Please enter a valid student ID.");
+                return;
+            }
+
+            if (course == null) {
+                System.out.println("Course not found. Please enter a valid course name.");
+                return;
+            }
+
             executeAction(inputScanner, actionName, student, course, inputCourseName);
         } else {
             System.out.println("Invalid input. Please enter a valid integer for the student ID.");
@@ -65,6 +75,6 @@ public class StudentInCourseProcessor {
         return courses.stream()
             .filter(c -> c.getName().equalsIgnoreCase(inputCourseName))
             .findFirst()
-            .orElse(new Course());
+            .orElse(null);
     }
 }

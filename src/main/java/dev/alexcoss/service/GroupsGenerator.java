@@ -1,24 +1,32 @@
 package dev.alexcoss.service;
 
 import dev.alexcoss.model.Group;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+@Component
 public class GroupsGenerator {
-    private static final int GROUP_COUNT = 10;
-    private static final int QUANTITY_CHARACTERS = 2;
-    private static final int QUANTITY_NUMBERS = 2;
-    private static final char CHAR_FIRST = 'A';
-    private static final char CHAR_LAST = 'Z';
+    @Value("${data.groups.count}")
+    private int groupCount;
+    @Value("${data.groups.quantity_characters}")
+    private int quantityCharacters;
+    @Value("${data.groups.quantity_numbers}")
+    private int quantityNumbers;
+    @Value("${data.groups.char_first}")
+    private char charFirst;
+    @Value("${data.groups.char_last}")
+    private char charLast;
 
     private final Random random = new Random();
 
     public List<Group> generateGroupList() {
         List<Group> groupList = new ArrayList<>();
 
-        for (int i = 0; i < GROUP_COUNT; i++) {
+        for (int i = 0; i < groupCount; i++) {
             Group group = generateRandomName();
             groupList.add(group);
         }
@@ -29,13 +37,13 @@ public class GroupsGenerator {
     private Group generateRandomName() {
         StringBuilder nameBuilder = new StringBuilder();
 
-        for (int i = 0; i < QUANTITY_CHARACTERS; i++) {
+        for (int i = 0; i < quantityCharacters; i++) {
             nameBuilder.append(generateRandomCharacter());
         }
 
         nameBuilder.append('-');
 
-        for (int i = 0; i < QUANTITY_NUMBERS; i++) {
+        for (int i = 0; i < quantityNumbers; i++) {
             nameBuilder.append(generateRandomDigit());
         }
 
@@ -50,6 +58,6 @@ public class GroupsGenerator {
     }
 
     private char generateRandomCharacter() {
-        return (char) (CHAR_FIRST + random.nextInt(CHAR_LAST - CHAR_FIRST + 1));
+        return (char) (charFirst + random.nextInt(charLast - charFirst + 1));
     }
 }

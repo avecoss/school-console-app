@@ -1,13 +1,22 @@
 package dev.alexcoss.dao;
 
+import dev.alexcoss.mapper.GroupRowMapper;
 import dev.alexcoss.model.Group;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.AbstractMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+@Repository
 public class GroupDao extends AbstractDao<Group, List<Group>> {
 
     private static final String INSERT_SQL = "INSERT INTO groups (group_name) VALUES (?)";
@@ -18,83 +27,70 @@ public class GroupDao extends AbstractDao<Group, List<Group>> {
         "      GROUP BY s.group_id, g.group_name\n" +
         "      ORDER BY num_students;";
 
-    public GroupDao(ConnectionFactory connectionFactory) {
-        super(GroupDao.class.getName(), connectionFactory);
+    @Autowired
+    public GroupDao(JdbcTemplate jdbcTemplate) {
+        super(GroupDao.class.getName(), jdbcTemplate);
     }
 
     @Override
     public void addItem(Group group) {
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
-
-            preparedStatement.setString(1, group.getName());
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
+        try {
+            jdbcTemplate.update(INSERT_SQL, getGroupParameters(group));
+        } catch (DataAccessException e) {
             handleSQLException(e, "Error adding group to database", INSERT_SQL, group);
         }
     }
 
     @Override
     public void addAllItems(List<Group> groupList) {
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
+        try {
+            jdbcTemplate.batchUpdate(INSERT_SQL, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    Group group = groupList.get(i);
+                    ps.setString(1, group.getName());
+                }
 
-            for (Group group : groupList) {
-                preparedStatement.setString(1, group.getName());
-                preparedStatement.addBatch();
-            }
-
-            preparedStatement.executeBatch();
-        } catch (SQLException e) {
+                @Override
+                public int getBatchSize() {
+                    return groupList.size();
+                }
+            });
+        } catch (DataAccessException e) {
             handleSQLException(e, "Error adding groups to database", INSERT_SQL, groupList);
         }
     }
 
     @Override
     public List<Group> getAllItems() {
-        List<Group> groups = new ArrayList<>();
-
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_SQL);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-
-            while (resultSet.next()) {
-                Group group = resultSetToObject(resultSet);
-                groups.add(group);
-            }
-        } catch (SQLException e) {
+        try {
+            return jdbcTemplate.query(SELECT_ALL_SQL, new GroupRowMapper());
+        } catch (DataAccessException e) {
             handleSQLException(e, "Error getting groups from database", SELECT_ALL_SQL);
+            return Collections.emptyList();
         }
-
-        return groups;
     }
 
     public Map<Group, Integer> getAllGroupsWithStudents() {
-        Map<Group, Integer> groupsWithStudents = new HashMap<>();
+        try {
+            return jdbcTemplate.query(SELECT_ALL_WITH_STUDENTS, (resultSet, rowNum) -> {
+                    Group group = new Group();
+                    group.setId(resultSet.getInt("group_id"));
+                    group.setName(resultSet.getString("group_name"));
 
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_WITH_STUDENTS);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
+                    int numStudents = resultSet.getInt("num_students");
 
-            while (resultSet.next()) {
-                Group group = resultSetToObject(resultSet);
-                groupsWithStudents.put(group, resultSet.getInt("num_students"));
-            }
-            logger.info("Successfully retrieved all groups with students from the database.");
-        } catch (SQLException e) {
+                    return new AbstractMap.SimpleEntry<>(group, numStudents);
+                }).stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        } catch (DataAccessException e) {
             handleSQLException(e, "Error getting all groups with students from database", SELECT_ALL_WITH_STUDENTS);
+            return Collections.emptyMap();
         }
-
-        return groupsWithStudents;
     }
 
-    @Override
-    protected Group resultSetToObject(ResultSet resultSet) throws SQLException {
-        Group group = new Group();
-
-        group.setId(resultSet.getInt("group_id"));
-        group.setName(resultSet.getString("group_name"));
-
-        return group;
+    private Object[] getGroupParameters(Group group) {
+        return new Object[]{group.getName()};
     }
 }

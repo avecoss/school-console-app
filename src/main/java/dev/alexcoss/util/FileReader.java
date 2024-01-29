@@ -2,7 +2,8 @@ package dev.alexcoss.util;
 
 import dev.alexcoss.util.exceptions.FileReadException;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;

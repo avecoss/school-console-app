@@ -2,9 +2,11 @@ package dev.alexcoss.service;
 
 import dev.alexcoss.model.Course;
 import dev.alexcoss.model.Student;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
+@Component
 public class CourseRandomizer extends Randomizer {
 
     private static final int MIN_COURSES = 1;

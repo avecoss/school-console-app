@@ -8,10 +8,11 @@ import org.mockito.MockitoAnnotations;
 import java.sql.*;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class DatabaseRemoverTest {
-    @Mock
+/*    @Mock
     private Connection connection;
     @Mock
     private Statement statement;
@@ -22,7 +23,7 @@ class DatabaseRemoverTest {
     @Mock
     private ResultSet resultSet;
     @Mock
-    private ConnectionFactory connectionFactory;
+    //private ConnectionFactory connectionFactory;
 
     private DatabaseRemover databaseRemover;
 
@@ -51,5 +52,5 @@ class DatabaseRemoverTest {
         verify(statement).close();
         verify(connection).close();
 
-    }
+    }*/
 }

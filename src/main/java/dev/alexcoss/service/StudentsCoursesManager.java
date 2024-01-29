@@ -5,17 +5,21 @@ import dev.alexcoss.dao.StudentDao;
 import dev.alexcoss.dao.StudentsCoursesDao;
 import dev.alexcoss.model.Course;
 import dev.alexcoss.model.Student;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Component
 public class StudentsCoursesManager {
     private final CourseRandomizer courseRandomizer;
     private final StudentsCoursesDao studentsCoursesDao;
     private final StudentDao studentDao;
     private final CourseDao courseDao;
 
+    @Autowired
     public StudentsCoursesManager(CourseRandomizer courseRandomizer, StudentsCoursesDao studentsCoursesDao,
                                   StudentDao studentDao, CourseDao courseDao) {
 

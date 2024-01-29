@@ -1,0 +1,30 @@
+# Data source
+spring:
+    datasource:
+        driver-class-name: org.postgresql.Driver
+        url: jdbc:postgresql://localhost:5432/school_database
+        username: school_admin
+        password: 1111
+
+    flyway:
+        url: jdbc:postgresql://localhost:5432/school_database
+        user: school_admin
+        password: 1111
+        locations: db/migration
+        baselineOnMigrate: true
+        baselineVersion: 1
+        baselineDescription: Base migration
+
+
+# Parameters for generation
+data:
+    students:
+        count: 200
+
+    groups:
+        count: 10
+        quantity_characters: 2
+        quantity_numbers: 2
+        char_first: 'A'
+        char_last: 'Z'
+

@@ -2,11 +2,13 @@ package dev.alexcoss.service;
 
 import dev.alexcoss.model.Course;
 import dev.alexcoss.util.FileReader;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class CoursesGenerator {
     private static final String COURSES_PATH = "src/main/resources/data/courses.txt";
 
