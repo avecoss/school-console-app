@@ -1,53 +1,39 @@
 package dev.alexcoss.dao;
 
 import dev.alexcoss.model.Course;
-import org.h2.jdbcx.JdbcDataSource;
-import org.junit.jupiter.api.AfterEach;
+import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@Testcontainers
+@ActiveProfiles("test")
+@JdbcTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class CourseDaoTest {
-
-    private static final String CREATE_TABLE_SQL = "CREATE TABLE courses\n" +
-        "(\n" +
-        "    course_id          SERIAL PRIMARY KEY,\n" +
-        "    course_name        VARCHAR(100) NOT NULL,\n" +
-        "    course_description VARCHAR(100)\n" +
-        ");";
-    private static final String H2_URL = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1";
-
-    private ConnectionFactory connectionFactory;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private Flyway flyway;
     private CourseDao courseDao;
 
     @BeforeEach
-    void setUp() throws SQLException {
-        JdbcDataSource dataSource = new JdbcDataSource();
-        dataSource.setURL(H2_URL);
-
-        connectionFactory = new H2ConnectionFactory(dataSource);
-        courseDao = new CourseDao(connectionFactory);
-
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(CREATE_TABLE_SQL)) {
-            preparedStatement.execute();
-        }
-    }
-
-    @AfterEach
-    void tearDown() throws SQLException {
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("DROP TABLE courses")) {
-            preparedStatement.execute();
-        }
+    void setUp() {
+        flyway.clean();
+        courseDao = new CourseDao(jdbcTemplate);
+        flyway.migrate();
     }
 
     @Test
@@ -65,9 +51,9 @@ class CourseDaoTest {
     @Test
     void shouldAddAllItems() {
         List<Course> courseList = new ArrayList<>();
-        courseList.add(getTestCourse(1,"Test1"));
-        courseList.add(getTestCourse(2,"Test2"));
-        courseList.add(getTestCourse(3,"Test3"));
+        courseList.add(getTestCourse(1, "Test1"));
+        courseList.add(getTestCourse(2, "Test2"));
+        courseList.add(getTestCourse(3, "Test3"));
 
         courseDao.addAllItems(courseList);
 
@@ -79,19 +65,16 @@ class CourseDaoTest {
     }
 
     @Test
+    @Sql(
+        scripts = {"/sql/clear_tables.sql", "/sql/populate_courses.sql"},
+        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
+    )
     void shouldGetAllItems() {
-        List<Course> courseList = new ArrayList<>();
-        courseList.add(getTestCourse(1,"Test1"));
-        courseList.add(getTestCourse(2,"Test2"));
-        courseList.add(getTestCourse(3,"Test3"));
-
-        courseDao.addAllItems(courseList);
-
         List<Course> retrievedCourses = courseDao.getAllItems();
 
         assertNotNull(retrievedCourses);
-        assertEquals(courseList.size(), retrievedCourses.size());
-        assertEquals(courseList, retrievedCourses);
+        assertEquals(3, retrievedCourses.size());
+        assertEquals("name_2", retrievedCourses.get(1).getName());
     }
 
     private Course getTestCourse() {

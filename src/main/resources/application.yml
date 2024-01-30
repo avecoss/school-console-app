@@ -15,6 +15,9 @@ spring:
         baselineVersion: 1
         baselineDescription: Base migration
 
+    profiles:
+        active: default
+
 
 # Parameters for generation
 data:
