@@ -35,7 +35,7 @@ public class GroupDao extends AbstractDao<Group, List<Group>> {
     @Override
     public void addItem(Group group) {
         try {
-            jdbcTemplate.update(INSERT_SQL, getGroupParameters(group));
+            jdbcTemplate.update(INSERT_SQL, group.getName());
         } catch (DataAccessException e) {
             handleSQLException(e, "Error adding group to database", INSERT_SQL, group);
         }
@@ -88,9 +88,5 @@ public class GroupDao extends AbstractDao<Group, List<Group>> {
             handleSQLException(e, "Error getting all groups with students from database", SELECT_ALL_WITH_STUDENTS);
             return Collections.emptyMap();
         }
-    }
-
-    private Object[] getGroupParameters(Group group) {
-        return new Object[]{group.getName()};
     }
 }

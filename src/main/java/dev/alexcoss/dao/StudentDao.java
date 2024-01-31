@@ -37,7 +37,8 @@ public class StudentDao extends AbstractDao<Student, List<Student>> {
     @Override
     public void addItem(Student student) {
         try {
-            jdbcTemplate.update(INSERT_SQL, getStudentParameters(student));
+            Integer groupId = getGroupId(student);
+            jdbcTemplate.update(INSERT_SQL, groupId, student.getFirstName(), student.getLastName());
         } catch (DataAccessException e) {
             handleSQLException(e, "Error adding student to database", INSERT_SQL, student);
         }
@@ -45,7 +46,8 @@ public class StudentDao extends AbstractDao<Student, List<Student>> {
 
     public void updateStudent(Student updateStudent) {
         try {
-            jdbcTemplate.update(UPDATE_SQL, getStudentParameters(updateStudent, updateStudent.getId()));
+            Integer groupId = getGroupId(updateStudent);
+            jdbcTemplate.update(UPDATE_SQL, groupId, updateStudent.getFirstName(), updateStudent.getLastName(), updateStudent.getId());
         } catch (DataAccessException e) {
             handleSQLException(e, "Error updating student to database", UPDATE_SQL, updateStudent);
         }
@@ -112,16 +114,6 @@ public class StudentDao extends AbstractDao<Student, List<Student>> {
             handleSQLException(e, "Error getting students by course from database", SELECT_STUDENTS_IN_COURSE_SQL);
             return Collections.emptyList();
         }
-    }
-
-    private Object[] getStudentParameters(Student student) {
-        Integer groupId = getGroupId(student);
-        return new Object[]{groupId, student.getFirstName(), student.getLastName()};
-    }
-
-    private Object[] getStudentParameters(Student student, Integer id) {
-        Integer groupId = getGroupId(student);
-        return new Object[]{groupId, student.getFirstName(), student.getLastName(), id};
     }
 
     private Integer getGroupId(Student student) {

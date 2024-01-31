@@ -27,7 +27,7 @@ public class CourseDao extends AbstractDao<Course, List<Course>> {
     @Override
     public void addItem(Course course) {
         try {
-            jdbcTemplate.update(INSERT_SQL, getCourseParameters(course));
+            jdbcTemplate.update(INSERT_SQL, course.getName(), course.getDescription());
         } catch (DataAccessException e) {
             handleSQLException(e, "Error adding course to database", INSERT_SQL, course);
         }
@@ -63,9 +63,5 @@ public class CourseDao extends AbstractDao<Course, List<Course>> {
             handleSQLException(e, "Error getting courses from database", SELECT_ALL_SQL);
             return Collections.emptyList();
         }
-    }
-
-    private Object[] getCourseParameters(Course course) {
-        return new Object[]{course.getName(), course.getDescription()};
     }
 }
