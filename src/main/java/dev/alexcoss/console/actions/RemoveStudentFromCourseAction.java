@@ -1,7 +1,6 @@
 package dev.alexcoss.console.actions;
 
 import dev.alexcoss.console.CommandInputScanner;
-import dev.alexcoss.dao.StudentsCoursesDao;
 
 import java.util.Scanner;
 

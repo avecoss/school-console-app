@@ -1,81 +1,67 @@
 package dev.alexcoss.dao;
 
+import dev.alexcoss.mapper.CourseRowMapper;
 import dev.alexcoss.model.Course;
-import dev.alexcoss.model.Student;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+@Repository
 public class CourseDao extends AbstractDao<Course, List<Course>> {
 
     private static final String INSERT_SQL = "INSERT INTO courses (course_name, course_description) VALUES (?, ?)";
     private static final String SELECT_ALL_SQL = "SELECT * FROM courses";
 
-    public CourseDao(ConnectionFactory connectionFactory) {
-        super(CourseDao.class.getName(), connectionFactory);
+    @Autowired
+    public CourseDao(JdbcTemplate jdbcTemplate) {
+        super(CourseDao.class.getName(), jdbcTemplate);
     }
 
     @Override
     public void addItem(Course course) {
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
-
-            preparedStatement.setString(1, course.getName());
-            preparedStatement.setString(2, course.getDescription());
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
+        try {
+            jdbcTemplate.update(INSERT_SQL, course.getName(), course.getDescription());
+        } catch (DataAccessException e) {
             handleSQLException(e, "Error adding course to database", INSERT_SQL, course);
         }
     }
 
     @Override
     public void addAllItems(List<Course> courseList) {
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
+        try {
+            jdbcTemplate.batchUpdate(INSERT_SQL, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    Course course = courseList.get(i);
 
-            for (Course course : courseList) {
-                preparedStatement.setString(1, course.getName());
-                preparedStatement.setString(2, course.getDescription());
-                preparedStatement.addBatch();
-            }
+                    ps.setString(1, course.getName());
+                    ps.setString(2, course.getDescription());
+                }
 
-            preparedStatement.executeBatch();
-        } catch (SQLException e) {
+                @Override
+                public int getBatchSize() {
+                    return courseList.size();
+                }
+            });
+        } catch (DataAccessException e) {
             handleSQLException(e, "Error adding courses to database", INSERT_SQL, courseList);
         }
     }
 
     @Override
     public List<Course> getAllItems() {
-        List<Course> courses = new ArrayList<>();
-
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_SQL);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-
-            while (resultSet.next()) {
-                Course course = resultSetToObject(resultSet);
-                courses.add(course);
-            }
-        } catch (SQLException e) {
+        try {
+            return jdbcTemplate.query(SELECT_ALL_SQL, new CourseRowMapper());
+        } catch (DataAccessException e) {
             handleSQLException(e, "Error getting courses from database", SELECT_ALL_SQL);
+            return Collections.emptyList();
         }
-
-        return courses;
-    }
-
-    @Override
-    protected Course resultSetToObject(ResultSet resultSet) throws SQLException {
-        Course course = new Course();
-
-        course.setId(resultSet.getInt("course_id"));
-        course.setName(resultSet.getString("course_name"));
-        course.setDescription(resultSet.getString("course_description"));
-
-        return course;
     }
 }

@@ -4,7 +4,6 @@ import dev.alexcoss.console.CommandInputScanner;
 import dev.alexcoss.model.Student;
 
 import java.util.Scanner;
-import java.util.function.Consumer;
 
 public class PrintStudentByIdAction extends AbstractAction {
 

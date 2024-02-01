@@ -1,10 +1,12 @@
 package dev.alexcoss.console;
 
 import dev.alexcoss.util.FileReader;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class DatabaseConsoleManager {
     private static final String COMMANDS_PATH = "src/main/resources/data/commands.txt";
     private static final String TITLE = "Interface to manage database";

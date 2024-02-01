@@ -1,11 +1,9 @@
 package dev.alexcoss.console.actions;
 
 import dev.alexcoss.console.CommandInputScanner;
-import dev.alexcoss.console.actions.AbstractAction;
 import dev.alexcoss.dao.StudentDao;
 
 import java.util.Scanner;
-import java.util.function.Consumer;
 
 public class DeleteStudentByIdAction extends AbstractAction {
     public DeleteStudentByIdAction(CommandInputScanner commandInputScanner) {

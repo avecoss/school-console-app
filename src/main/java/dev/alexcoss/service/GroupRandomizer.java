@@ -2,11 +2,13 @@ package dev.alexcoss.service;
 
 import dev.alexcoss.model.Group;
 import dev.alexcoss.model.Student;
+import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
+@Component
 public class GroupRandomizer extends Randomizer {
-
     private static final int MIN_STUDENTS_IN_GROUP = 10;
     private static final int MAX_STUDENTS_IN_GROUP = 30;
 
@@ -14,7 +16,6 @@ public class GroupRandomizer extends Randomizer {
         shuffleCollections(students, groups);
 
         List<Student> studentsInGroups = new ArrayList<>();
-
         distributeStudentsToGroups(students, groups, studentsInGroups);
         studentsInGroups.addAll(students);
 

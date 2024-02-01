@@ -1,11 +1,21 @@
 package dev.alexcoss.dao;
 
+import dev.alexcoss.mapper.StudentRowMapper;
 import dev.alexcoss.model.Student;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.Collections;
 import java.util.List;
 
+@Repository
 public class StudentDao extends AbstractDao<Student, List<Student>> {
 
     private static final String INSERT_SQL = "INSERT INTO students (group_id, first_name, last_name) VALUES (?, ?, ?)";
@@ -19,139 +29,99 @@ public class StudentDao extends AbstractDao<Student, List<Student>> {
         "         JOIN students as s ON sc.student_id = s.student_id\n" +
         "WHERE c.course_name = ?";
 
-    public StudentDao(ConnectionFactory connectionFactory) {
-        super(StudentDao.class.getName(), connectionFactory);
+    @Autowired
+    public StudentDao(JdbcTemplate jdbcTemplate) {
+        super(StudentDao.class.getName(), jdbcTemplate);
     }
 
     @Override
     public void addItem(Student student) {
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
-
-            setStudentValuesToStatement(student, preparedStatement);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
+        try {
+            Integer groupId = getGroupId(student);
+            jdbcTemplate.update(INSERT_SQL, groupId, student.getFirstName(), student.getLastName());
+        } catch (DataAccessException e) {
             handleSQLException(e, "Error adding student to database", INSERT_SQL, student);
         }
     }
 
-    public void updateStudent(Student student) {
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
-
-            setStudentValuesToStatement(student, preparedStatement);
-            preparedStatement.setInt(4, student.getId());
-
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            handleSQLException(e, "Error updating student to database", UPDATE_SQL, student);
+    public void updateStudent(Student updateStudent) {
+        try {
+            Integer groupId = getGroupId(updateStudent);
+            jdbcTemplate.update(UPDATE_SQL, groupId, updateStudent.getFirstName(), updateStudent.getLastName(), updateStudent.getId());
+        } catch (DataAccessException e) {
+            handleSQLException(e, "Error updating student to database", UPDATE_SQL, updateStudent);
         }
     }
 
     public Student getStudentById(int studentId) {
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID_SQL)) {
-
-            preparedStatement.setInt(1, studentId);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSetToObject(resultSet);
-                }
-            }
-
-        } catch (SQLException e) {
+        try {
+            return jdbcTemplate.query(SELECT_BY_ID_SQL, new StudentRowMapper(), studentId)
+                .stream()
+                .findAny()
+                .orElseThrow(() -> new EmptyResultDataAccessException(studentId));
+        } catch (EmptyResultDataAccessException e) {
             handleSQLException(e, "Error getting student by id from database", SELECT_BY_ID_SQL, studentId);
+            return null;
         }
-        return null;
     }
 
     public void removeStudentById(int studentId) {
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_SQL)) {
-
-            preparedStatement.setInt(1, studentId);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
+        try {
+            jdbcTemplate.update(DELETE_SQL, studentId);
+        } catch (DataAccessException e) {
             handleSQLException(e, "Error removing student from database", DELETE_SQL, studentId);
         }
     }
 
     @Override
     public List<Student> getAllItems() {
-        List<Student> students = new ArrayList<>();
-
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_SQL);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-
-            while (resultSet.next()) {
-                Student student = resultSetToObject(resultSet);
-                students.add(student);
-            }
-        } catch (SQLException e) {
+        try {
+            return jdbcTemplate.query(SELECT_ALL_SQL, new StudentRowMapper());
+        } catch (DataAccessException e) {
             handleSQLException(e, "Error getting students from database", SELECT_ALL_SQL);
+            return Collections.emptyList();
         }
-        return students;
     }
 
     @Override
     public void addAllItems(List<Student> studentList) {
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
+        try {
+            jdbcTemplate.batchUpdate(INSERT_SQL, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    Student student = studentList.get(i);
+                    Integer groupId = (!student.getDefaultInteger().equals(student.getGroupId())) ? student.getGroupId() : null;
 
-            for (Student student : studentList) {
+                    ps.setObject(1, groupId, Types.INTEGER);
+                    ps.setString(2, student.getFirstName());
+                    ps.setString(3, student.getLastName());
+                }
 
-                setStudentValuesToStatement(student, preparedStatement);
-                preparedStatement.addBatch();
-            }
-
-            preparedStatement.executeBatch();
-        } catch (SQLException e) {
+                @Override
+                public int getBatchSize() {
+                    return studentList.size();
+                }
+            });
+        } catch (DataAccessException e) {
             handleSQLException(e, "Error adding students to database", INSERT_SQL, studentList);
         }
     }
 
     public List<Student> getStudentsByCourse(String courseName) {
-        List<Student> students = new ArrayList<>();
-
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_STUDENTS_IN_COURSE_SQL)) {
-            preparedStatement.setString(1, courseName);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    students.add(resultSetToObject(resultSet));
-                }
-            }
-        } catch (SQLException e) {
+        try {
+            return jdbcTemplate.query(SELECT_STUDENTS_IN_COURSE_SQL, new StudentRowMapper(), courseName);
+        } catch (DataAccessException e) {
             handleSQLException(e, "Error getting students by course from database", SELECT_STUDENTS_IN_COURSE_SQL);
+            return Collections.emptyList();
         }
-
-        return students;
     }
 
-    @Override
-    protected Student resultSetToObject(ResultSet resultSet) throws SQLException {
-        Student student = new Student();
-
-        student.setId(resultSet.getInt("student_id"));
-        student.setFirstName(resultSet.getString("first_name"));
-        student.setLastName(resultSet.getString("last_name"));
-        student.setGroupId(resultSet.getObject("group_id", Integer.class));
-
-        return student;
-    }
-
-    private void setStudentValuesToStatement(Student student, PreparedStatement preparedStatement) throws SQLException {
+    private Integer getGroupId(Student student) {
         Integer groupId = null;
         if (!student.getDefaultInteger().equals(student.getGroupId())) {
             groupId = student.getGroupId();
         }
-
-        preparedStatement.setObject(1, groupId, Types.INTEGER);
-        preparedStatement.setString(2, student.getFirstName());
-        preparedStatement.setString(3, student.getLastName());
+        return groupId;
     }
 }
 

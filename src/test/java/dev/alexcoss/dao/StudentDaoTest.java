@@ -1,53 +1,41 @@
 package dev.alexcoss.dao;
 
 import dev.alexcoss.model.Student;
+import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-import org.h2.jdbcx.JdbcDataSource;
-import org.junit.jupiter.api.*;
-
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Testcontainers
+@ActiveProfiles("test")
+@JdbcTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class StudentDaoTest {
-    private static final String CREATE_TABLE_SQL = "CREATE TABLE students\n" +
-        "(\n" +
-        "    student_id SERIAL PRIMARY KEY,\n" +
-        "    group_id   INT,\n" +
-        "    first_name VARCHAR(100) NOT NULL,\n" +
-        "    last_name  VARCHAR(100) NOT NULL\n" +
-        ");";
-    private static final String H2_URL = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1";
-
-    private ConnectionFactory connectionFactory;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private Flyway flyway;
     private StudentDao studentDao;
 
     @BeforeEach
-    void setUp() throws SQLException {
-        JdbcDataSource dataSource = new JdbcDataSource();
-        dataSource.setURL(H2_URL);
-
-        connectionFactory = new H2ConnectionFactory(dataSource);
-        studentDao = new StudentDao(connectionFactory);
-
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(CREATE_TABLE_SQL)) {
-            preparedStatement.execute();
-        }
-    }
-
-    @AfterEach
-    void tearDown() throws SQLException {
-        try (Connection connection = connectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("DROP TABLE students")) {
-            preparedStatement.execute();
-        }
+    void setUp() {
+        flyway.clean();
+        studentDao = new StudentDao(jdbcTemplate);
+        flyway.migrate();
     }
 
     @Test
-    @Order(1)
     void shouldAddItem() {
         Student student = getTestStudent();
         studentDao.addItem(student);
@@ -59,7 +47,6 @@ class StudentDaoTest {
     }
 
     @Test
-    @Order(2)
     void shouldGetStudentById() {
         Student student = getTestStudent();
         studentDao.addItem(student);
@@ -68,12 +55,11 @@ class StudentDaoTest {
     }
 
     @Test
-    @Order(3)
     void shouldUpdateStudent() {
         Student student = getTestStudent();
         studentDao.addItem(student);
 
-        student.setGroupId(1);
+        student.setFirstName("firstName");
         studentDao.updateStudent(student);
 
         Student updatedStudent = studentDao.getStudentById(1);
@@ -83,7 +69,6 @@ class StudentDaoTest {
     }
 
     @Test
-    @Order(4)
     void shouldRemoveStudentById() {
         Student student = getTestStudent();
         studentDao.addItem(student);
