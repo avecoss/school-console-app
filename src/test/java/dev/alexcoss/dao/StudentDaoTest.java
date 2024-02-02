@@ -14,6 +14,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -40,10 +41,10 @@ class StudentDaoTest {
         Student student = getTestStudent();
         studentDao.addItem(student);
 
-        Student retrievedStudent = studentDao.getStudentById(1);
+        Optional<Student> retrievedStudent = studentDao.getStudentById(1);
 
-        assertNotNull(retrievedStudent);
-        assertEquals(student, retrievedStudent);
+        assertTrue(retrievedStudent.isPresent());
+        assertEquals(student, retrievedStudent.get());
     }
 
     @Test
@@ -51,7 +52,10 @@ class StudentDaoTest {
         Student student = getTestStudent();
         studentDao.addItem(student);
 
-        assertEquals(student, studentDao.getStudentById(1));
+        Optional<Student> retrievedStudent = studentDao.getStudentById(1);
+
+        assertTrue(retrievedStudent.isPresent());
+        assertEquals(student, retrievedStudent.get());
     }
 
     @Test
@@ -62,10 +66,10 @@ class StudentDaoTest {
         student.setFirstName("firstName");
         studentDao.updateStudent(student);
 
-        Student updatedStudent = studentDao.getStudentById(1);
+        Optional<Student> updatedStudent = studentDao.getStudentById(1);
 
-        assertNotNull(updatedStudent);
-        assertEquals(student, updatedStudent);
+        assertTrue(updatedStudent.isPresent());
+        assertEquals(student, updatedStudent.get());
     }
 
     @Test
@@ -73,9 +77,9 @@ class StudentDaoTest {
         Student student = getTestStudent();
         studentDao.addItem(student);
 
-        studentDao.removeStudentById(1);
+        Optional<Student> removedStudent = studentDao.getStudentById(1);
 
-        assertNull(studentDao.getStudentById(1));
+        assertFalse(removedStudent.isPresent());
     }
 
     @Test

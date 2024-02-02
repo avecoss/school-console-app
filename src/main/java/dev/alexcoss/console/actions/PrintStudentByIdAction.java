@@ -3,6 +3,7 @@ package dev.alexcoss.console.actions;
 import dev.alexcoss.console.CommandInputScanner;
 import dev.alexcoss.model.Student;
 
+import java.util.Optional;
 import java.util.Scanner;
 
 public class PrintStudentByIdAction extends AbstractAction {
@@ -14,9 +15,9 @@ public class PrintStudentByIdAction extends AbstractAction {
     @Override
     public void execute(Scanner scanner) {
         StudentProcessor.processStudentById(scanner, studentId -> {
-                Student student = commandInputScanner.getStudentDao().getStudentById(studentId);
-                if (student != null) {
-                    System.out.println("Student: " + student);
+                Optional<Student> optional = commandInputScanner.getStudentService().getStudentById(studentId);
+                if (optional.isPresent()) {
+                    System.out.println("Student: " + optional.get());
                 } else {
                     System.out.println("Student not found");
                 }

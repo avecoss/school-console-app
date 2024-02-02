@@ -1,4 +1,4 @@
-package dev.alexcoss.service;
+package dev.alexcoss.service.generator.rangomizer;
 
 import java.util.Collections;
 import java.util.List;

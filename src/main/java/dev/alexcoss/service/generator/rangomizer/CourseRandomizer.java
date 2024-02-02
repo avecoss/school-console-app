@@ -1,7 +1,8 @@
-package dev.alexcoss.service;
+package dev.alexcoss.service.generator.rangomizer;
 
 import dev.alexcoss.model.Course;
 import dev.alexcoss.model.Student;
+import dev.alexcoss.service.generator.rangomizer.Randomizer;
 import org.springframework.stereotype.Component;
 
 import java.util.*;

@@ -1,7 +1,8 @@
-package dev.alexcoss.service;
+package dev.alexcoss.service.generator;
 
 import dev.alexcoss.dao.CourseDao;
 import dev.alexcoss.model.Course;
+import dev.alexcoss.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -9,12 +10,12 @@ import java.util.List;
 
 @Component
 public class CourseManager {
-    private final CourseDao courseDao;
+    private final CourseService courseService;
     private final CoursesGenerator coursesGenerator;
 
     @Autowired
-    public CourseManager(CourseDao courseDao, CoursesGenerator coursesGenerator) {
-        this.courseDao = courseDao;
+    public CourseManager(CourseService courseService, CoursesGenerator coursesGenerator) {
+        this.courseService = courseService;
         this.coursesGenerator = coursesGenerator;
     }
 
@@ -28,6 +29,6 @@ public class CourseManager {
     }
 
     private void saveCoursesToDatabase(List<Course> courses) {
-        courseDao.addAllItems(courses);
+        courseService.addCourses(courses);
     }
 }

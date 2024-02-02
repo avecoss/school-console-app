@@ -1,4 +1,4 @@
-package dev.alexcoss.service;
+package dev.alexcoss.service.generator;
 
 import dev.alexcoss.model.Student;
 import dev.alexcoss.util.FileReader;

@@ -1,9 +1,10 @@
-package dev.alexcoss.service;
+package dev.alexcoss.service.generator;
 
-import dev.alexcoss.dao.GroupDao;
-import dev.alexcoss.dao.StudentDao;
 import dev.alexcoss.model.Group;
 import dev.alexcoss.model.Student;
+import dev.alexcoss.service.GroupService;
+import dev.alexcoss.service.StudentService;
+import dev.alexcoss.service.generator.rangomizer.GroupRandomizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -11,19 +12,18 @@ import java.util.List;
 
 @Component
 public class StudentManager {
-    private final StudentDao studentDao;
+    private final StudentService studentService;
     private final GroupRandomizer groupRandomizer;
     private final StudentGenerator studentGenerator;
-    private final GroupDao groupDao;
+    private final GroupService groupService;
 
     @Autowired
-    public StudentManager(StudentDao studentDao, GroupRandomizer groupRandomizer,
-                          StudentGenerator studentGenerator, GroupDao groupDao) {
-
-        this.studentDao = studentDao;
+    public StudentManager(StudentService studentService, GroupRandomizer groupRandomizer,
+                          StudentGenerator studentGenerator, GroupService groupService) {
+        this.studentService = studentService;
         this.groupRandomizer = groupRandomizer;
         this.studentGenerator = studentGenerator;
-        this.groupDao = groupDao;
+        this.groupService = groupService;
     }
 
     public void generateAndSaveStudentsToDatabase() {
@@ -38,7 +38,7 @@ public class StudentManager {
     }
 
     private List<Group> getGroupsFromDatabase() {
-        return groupDao.getAllItems();
+        return groupService.getGroups();
     }
 
     private List<Student> assignStudentsToGroups(List<Student> students, List<Group> groups) {
@@ -46,6 +46,6 @@ public class StudentManager {
     }
 
     private void saveStudentsToDatabase(List<Student> students) {
-        studentDao.addAllItems(students);
+        studentService.addStudents(students);
     }
 }

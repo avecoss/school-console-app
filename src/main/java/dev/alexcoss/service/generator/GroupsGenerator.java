@@ -1,4 +1,4 @@
-package dev.alexcoss.service;
+package dev.alexcoss.service.generator;
 
 import dev.alexcoss.model.Group;
 import org.springframework.beans.factory.annotation.Value;

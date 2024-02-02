@@ -16,7 +16,7 @@ public class FindAllGroupsWithLessOrEqualStudentsAction extends AbstractAction {
 
     @Override
     public void execute(Scanner scanner) {
-        Map<Group, Integer> allGroupsWithStudents = commandInputScanner.getGroupDao().getAllGroupsWithStudents();
+        Map<Group, Integer> allGroupsWithStudents = commandInputScanner.getGroupService().getAllGroupsWithStudents();
 
         List<Map.Entry<Group, Integer>> minEntries = allGroupsWithStudents.entrySet().stream()
             .collect(Collectors.groupingBy(Map.Entry::getValue))

@@ -1,7 +1,7 @@
-package dev.alexcoss.service;
+package dev.alexcoss.service.generator;
 
-import dev.alexcoss.dao.GroupDao;
 import dev.alexcoss.model.Group;
+import dev.alexcoss.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -9,12 +9,12 @@ import java.util.List;
 
 @Component
 public class GroupManager {
-    private final GroupDao groupDao;
+    private final GroupService groupService;
     private final GroupsGenerator groupsGenerator;
 
     @Autowired
-    public GroupManager(GroupDao groupDao, GroupsGenerator groupsGenerator) {
-        this.groupDao = groupDao;
+    public GroupManager(GroupService groupService, GroupsGenerator groupsGenerator) {
+        this.groupService = groupService;
         this.groupsGenerator = groupsGenerator;
     }
 
@@ -28,6 +28,6 @@ public class GroupManager {
     }
 
     private void saveGroupsToDatabase(List<Group> groups) {
-        groupDao.addAllItems(groups);
+        groupService.addGroups(groups);
     }
 }

@@ -14,7 +14,7 @@ public class FindAllStudentsRelatedToCourseAction extends AbstractAction {
 
     @Override
     public void execute(Scanner scanner) {
-        List<Course> courses = commandInputScanner.getCourseDao().getAllItems();
+        List<Course> courses = commandInputScanner.getCourseService().getCourses();
         CoursePrinter.printListOfCourses(courses);
 
         scanner.nextLine();
@@ -24,12 +24,11 @@ public class FindAllStudentsRelatedToCourseAction extends AbstractAction {
 
         System.out.println("Executing command 2: Find all students related to the course with the given name " + courseName);
 
-        List<Student> studentsByCourse = commandInputScanner.getStudentDao().getStudentsByCourse(courseName);
+        List<Student> studentsByCourse = commandInputScanner.getStudentService().getStudentsByCourse(courseName);
         if (studentsByCourse.isEmpty()) {
             System.out.println("No students found for this course title " + courseName);
         } else {
             studentsByCourse.forEach(System.out::println);
-
         }
     }
 }

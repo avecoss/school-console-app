@@ -20,7 +20,7 @@ public class AddNewStudentAction extends AbstractAction {
         System.out.print("Enter student last name: ");
         student.setLastName(scanner.nextLine());
 
-        commandInputScanner.getStudentDao().addItem(student);
+        commandInputScanner.getStudentService().addStudent(student);
         System.out.println("Executing command 3: Add a new student");
     }
 }

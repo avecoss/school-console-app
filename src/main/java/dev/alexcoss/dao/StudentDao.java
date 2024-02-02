@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class StudentDao extends AbstractDao<Student, List<Student>> {
@@ -53,15 +54,14 @@ public class StudentDao extends AbstractDao<Student, List<Student>> {
         }
     }
 
-    public Student getStudentById(int studentId) {
+    public Optional<Student> getStudentById(int studentId) {
         try {
             return jdbcTemplate.query(SELECT_BY_ID_SQL, new StudentRowMapper(), studentId)
                 .stream()
-                .findAny()
-                .orElseThrow(() -> new EmptyResultDataAccessException(studentId));
-        } catch (EmptyResultDataAccessException e) {
+                .findAny();
+        } catch (DataAccessException e) {
             handleSQLException(e, "Error getting student by id from database", SELECT_BY_ID_SQL, studentId);
-            return null;
+            return Optional.empty();
         }
     }
 
