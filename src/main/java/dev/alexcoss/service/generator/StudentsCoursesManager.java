@@ -1,10 +1,7 @@
 package dev.alexcoss.service.generator;
 
-import dev.alexcoss.dao.CourseDao;
-import dev.alexcoss.dao.StudentDao;
-import dev.alexcoss.dao.StudentsCoursesDao;
-import dev.alexcoss.model.Course;
-import dev.alexcoss.model.Student;
+import dev.alexcoss.dto.CourseDTO;
+import dev.alexcoss.dto.StudentDTO;
 import dev.alexcoss.service.CourseService;
 import dev.alexcoss.service.StudentCourseService;
 import dev.alexcoss.service.StudentService;
@@ -33,21 +30,21 @@ public class StudentsCoursesManager {
     }
 
     public void assignStudentsToCoursesAndSave() {
-        List<Student> studentsFromDatabase = getStudentsFromDatabase();
-        List<Course> coursesFromDatabase = getCoursesFromDatabase();
+        List<StudentDTO> studentsFromDatabase = getStudentsFromDatabase();
+        List<CourseDTO> coursesFromDatabase = getCoursesFromDatabase();
         Map<Integer, Set<Integer>> mapStudentCourses = assignStudentsToCourse(studentsFromDatabase, coursesFromDatabase);
         saveCoursesToDatabase(mapStudentCourses);
     }
 
-    private List<Student> getStudentsFromDatabase() {
+    private List<StudentDTO> getStudentsFromDatabase() {
         return studentService.getStudents();
     }
 
-    private List<Course> getCoursesFromDatabase() {
+    private List<CourseDTO> getCoursesFromDatabase() {
         return courseService.getCourses();
     }
 
-    private Map<Integer, Set<Integer>> assignStudentsToCourse(List<Student> students, List<Course> courses) {
+    private Map<Integer, Set<Integer>> assignStudentsToCourse(List<StudentDTO> students, List<CourseDTO> courses) {
         return courseRandomizer.assignStudentsToCourse(students, courses);
     }
 

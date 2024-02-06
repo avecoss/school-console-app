@@ -22,33 +22,21 @@ public class StudentCourseService extends AbstractService {
 
     public void addAllStudentCourseRelationships(Map<Integer, Set<Integer>> studentCourseMap) {
         if (isValidStudentCourseMap(studentCourseMap)) {
-            try {
-                studentsCoursesRepository.addAllItems(studentCourseMap);
-            } catch (DataAccessException e) {
-                handleServiceException(e, "Error adding student-course relationships to database");
-            }
+            studentsCoursesRepository.addAllItems(studentCourseMap);
         }
     }
 
     public void addStudentToCourse(int studentId, int courseId) {
         if (isValidId(studentId, "Student ID") && isValidId(courseId, "Course ID")) {
-            try {
-                Map<Integer, Integer> map = Collections.singletonMap(studentId, courseId);
-                studentsCoursesRepository.addItem(map);
-            } catch (DataAccessException e) {
-                handleServiceException(e, "Error adding student to course in database");
-            }
+            Map<Integer, Integer> map = Collections.singletonMap(studentId, courseId);
+            studentsCoursesRepository.addItem(map);
         }
     }
 
     public void removeStudentFromCourse(int studentId, int courseId) {
         if (isValidId(studentId, "Student ID") && isValidId(courseId, "Course ID")) {
-            try {
-                Map<Integer, Integer> map = Collections.singletonMap(studentId, courseId);
-                studentsCoursesRepository.removeItems(map);
-            } catch (DataAccessException e) {
-                handleServiceException(e, "Error removing student from course in database");
-            }
+            Map<Integer, Integer> map = Collections.singletonMap(studentId, courseId);
+            studentsCoursesRepository.removeItems(map);
         }
     }
 

@@ -1,6 +1,6 @@
 package dev.alexcoss.service.generator;
 
-import dev.alexcoss.model.Student;
+import dev.alexcoss.dto.StudentDTO;
 import dev.alexcoss.util.FileReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -25,26 +25,26 @@ public class StudentGenerator {
         this.lastNamesList = readList(LAST_NAMES_PATH);
     }
 
-    public List<Student> generateStudents() {
-        List<Student> students = new ArrayList<>();
+    public List<StudentDTO> generateStudents() {
+        List<StudentDTO> students = new ArrayList<>();
         for (int i = 0; i < studentsCount; i++) {
             students.add(generateStudent());
         }
         return students;
     }
 
-    private Student generateStudent() {
+    private StudentDTO generateStudent() {
         String firstName = getRandomField(firstNamesList);
         String lastName = getRandomField(lastNamesList);
 
-        Student student = new Student();
+        StudentDTO student = new StudentDTO();
         student.setFirstName(firstName);
         student.setLastName(lastName);
 
         return student;
     }
 
-    private String getRandomField(List<String> list){
+    private String getRandomField(List<String> list) {
         Random random = new Random();
         return list.get(random.nextInt(list.size() - 1));
     }

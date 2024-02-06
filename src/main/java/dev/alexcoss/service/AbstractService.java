@@ -13,10 +13,6 @@ public abstract class AbstractService {
         this.logger = initializeLogger(loggerName);
     }
 
-    protected void handleServiceException(Exception e, String message) {
-        logger.log(Level.SEVERE, message, e);
-    }
-
     protected void handleServiceException(String message) {
         logger.log(Level.SEVERE, message);
     }

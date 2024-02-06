@@ -1,8 +1,8 @@
 package dev.alexcoss.console.actions;
 
 import dev.alexcoss.console.CommandInputScanner;
-import dev.alexcoss.model.Course;
-import dev.alexcoss.model.Student;
+import dev.alexcoss.dto.CourseDTO;
+import dev.alexcoss.dto.StudentDTO;
 
 import java.util.List;
 import java.util.Scanner;
@@ -14,7 +14,7 @@ public class FindAllStudentsRelatedToCourseAction extends AbstractAction {
 
     @Override
     public void execute(Scanner scanner) {
-        List<Course> courses = commandInputScanner.getCourseService().getCourses();
+        List<CourseDTO> courses = commandInputScanner.getCourseService().getCourses();
         CoursePrinter.printListOfCourses(courses);
 
         scanner.nextLine();
@@ -24,7 +24,7 @@ public class FindAllStudentsRelatedToCourseAction extends AbstractAction {
 
         System.out.println("Executing command 2: Find all students related to the course with the given name " + courseName);
 
-        List<Student> studentsByCourse = commandInputScanner.getStudentService().getStudentsByCourse(courseName);
+        List<StudentDTO> studentsByCourse = commandInputScanner.getStudentService().getStudentsByCourse(courseName);
         if (studentsByCourse.isEmpty()) {
             System.out.println("No students found for this course title " + courseName);
         } else {

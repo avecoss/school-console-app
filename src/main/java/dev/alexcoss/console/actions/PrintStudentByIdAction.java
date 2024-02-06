@@ -1,6 +1,7 @@
 package dev.alexcoss.console.actions;
 
 import dev.alexcoss.console.CommandInputScanner;
+import dev.alexcoss.dto.StudentDTO;
 import dev.alexcoss.model.Student;
 
 import java.util.Optional;
@@ -15,7 +16,7 @@ public class PrintStudentByIdAction extends AbstractAction {
     @Override
     public void execute(Scanner scanner) {
         StudentProcessor.processStudentById(scanner, studentId -> {
-                Optional<Student> optional = commandInputScanner.getStudentService().getStudentById(studentId);
+                Optional<StudentDTO> optional = commandInputScanner.getStudentService().getStudentById(studentId);
                 if (optional.isPresent()) {
                     System.out.println("Student: " + optional.get());
                 } else {

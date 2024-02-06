@@ -3,13 +3,10 @@ package dev.alexcoss.model;
 import java.util.Objects;
 
 public class Student {
-
-    private final Integer defaultInteger = -1;
-
     private int id;
     private String firstName;
     private String lastName;
-    private Integer groupId = defaultInteger;
+    private Integer groupId;
 
     public Integer getId() {
         return id;
@@ -40,11 +37,7 @@ public class Student {
     }
 
     public void setGroupId(Integer groupId) {
-        this.groupId = Objects.requireNonNullElse(groupId, defaultInteger);
-    }
-
-    public Integer getDefaultInteger() {
-        return defaultInteger;
+        this.groupId = groupId;
     }
 
     @Override

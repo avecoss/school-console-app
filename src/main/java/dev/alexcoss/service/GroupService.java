@@ -1,61 +1,55 @@
 package dev.alexcoss.service;
 
 import dev.alexcoss.dao.GroupDao;
-import dev.alexcoss.model.Group;
+import dev.alexcoss.dto.GroupDTO;
+import dev.alexcoss.mapper.GroupMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupService extends AbstractService {
 
     private GroupDao groupRepository;
+    private GroupMapper groupMapper;
 
     @Autowired
-    public GroupService(GroupDao groupRepository) {
+    public GroupService(GroupDao groupRepository, GroupMapper groupMapper) {
         super(GroupService.class.getName());
         this.groupRepository = groupRepository;
+        this.groupMapper = groupMapper;
     }
 
-    public List<Group> getGroups() {
-        try {
-            return groupRepository.getAllItems();
-        } catch (DataAccessException e) {
-            handleServiceException(e, "Error getting groups from database");
-            return Collections.emptyList();
-        }
+    public List<GroupDTO> getGroups() {
+        return groupMapper.mapToDTOList(groupRepository.getAllItems());
     }
 
-    public Map<Group, Integer> getAllGroupsWithStudents() {
-        try {
-            return groupRepository.getAllGroupsWithStudents();
-        } catch (DataAccessException e) {
-            handleServiceException(e, "Error getting all groups with students from database");
-            return Collections.emptyMap();
-        }
+    public Map<GroupDTO, Integer> getAllGroupsWithStudents() {
+        return groupRepository.getAllGroupsWithStudents()
+            .entrySet()
+            .stream()
+            .collect(Collectors.toMap(
+                entry -> groupMapper.mapToDTO(entry.getKey()),
+                Map.Entry::getValue
+            ));
     }
 
-    public void addGroups(List<Group> groupList) {
+    public void addGroups(List<GroupDTO> groupList) {
         if (isValidGroupList(groupList)) {
-            try {
-                groupRepository.addAllItems(groupList);
-            } catch (DataAccessException e) {
-                handleServiceException(e, "Error adding groups to database");
-            }
+            groupRepository.addAllItems(groupMapper.mapToEntityList(groupList));
         }
     }
 
-    private boolean isValidGroupList(List<Group> groupList) {
+    private boolean isValidGroupList(List<GroupDTO> groupList) {
         if (groupList == null || groupList.isEmpty()) {
             handleServiceException("Group list is null or empty");
             return false;
         }
 
-        for (Group group : groupList) {
+        for (GroupDTO group : groupList) {
             if (group == null) {
                 handleServiceException("Invalid group in the list");
                 return false;

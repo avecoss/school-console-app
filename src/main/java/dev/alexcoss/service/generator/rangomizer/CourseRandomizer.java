@@ -1,8 +1,7 @@
 package dev.alexcoss.service.generator.rangomizer;
 
-import dev.alexcoss.model.Course;
-import dev.alexcoss.model.Student;
-import dev.alexcoss.service.generator.rangomizer.Randomizer;
+import dev.alexcoss.dto.CourseDTO;
+import dev.alexcoss.dto.StudentDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -13,12 +12,12 @@ public class CourseRandomizer extends Randomizer {
     private static final int MIN_COURSES = 1;
     private static final int MAX_COURSES = 3;
 
-    public Map<Integer, Set<Integer>> assignStudentsToCourse(List<Student> students, List<Course> courses) {
+    public Map<Integer, Set<Integer>> assignStudentsToCourse(List<StudentDTO> students, List<CourseDTO> courses) {
         shuffleCollections(students, courses);
 
         Map<Integer, Set<Integer>> studentCourseAssignment = new HashMap<>();
 
-        for (Student student : students) {
+        for (StudentDTO student : students) {
             int quantityCourses = getRandomInteger(MAX_COURSES, MIN_COURSES);
             Set<Integer> studentCourses = getRandomCourses(courses, quantityCourses);
             studentCourseAssignment.put(student.getId(), studentCourses);
@@ -27,7 +26,7 @@ public class CourseRandomizer extends Randomizer {
         return studentCourseAssignment;
     }
 
-    private Set<Integer> getRandomCourses(List<Course> courses, int quantity) {
+    private Set<Integer> getRandomCourses(List<CourseDTO> courses, int quantity) {
         Set<Integer> studentCourses = new HashSet<>();
         int max = courses.size();
 
@@ -39,9 +38,9 @@ public class CourseRandomizer extends Randomizer {
         return studentCourses;
     }
 
-    private int getMinCourseId(List<Course> courses) {
+    private int getMinCourseId(List<CourseDTO> courses) {
         return courses.stream()
-            .mapToInt(Course::getId)
+            .mapToInt(CourseDTO::getId)
             .min()
             .orElseThrow(NoSuchElementException::new);
     }

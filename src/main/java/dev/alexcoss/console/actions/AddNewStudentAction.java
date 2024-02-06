@@ -1,7 +1,7 @@
 package dev.alexcoss.console.actions;
 
 import dev.alexcoss.console.CommandInputScanner;
-import dev.alexcoss.model.Student;
+import dev.alexcoss.dto.StudentDTO;
 
 import java.util.Scanner;
 
@@ -13,7 +13,7 @@ public class AddNewStudentAction extends AbstractAction {
     @Override
     public void execute(Scanner scanner) {
         scanner.nextLine();
-        Student student = new Student();
+        StudentDTO student = new StudentDTO();
         System.out.print("Enter student first name: ");
         student.setFirstName(scanner.nextLine());
 

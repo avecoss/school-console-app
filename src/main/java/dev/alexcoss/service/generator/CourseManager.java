@@ -1,7 +1,6 @@
 package dev.alexcoss.service.generator;
 
-import dev.alexcoss.dao.CourseDao;
-import dev.alexcoss.model.Course;
+import dev.alexcoss.dto.CourseDTO;
 import dev.alexcoss.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,15 +19,15 @@ public class CourseManager {
     }
 
     public void generateAndSaveCoursesToDatabase() {
-        List<Course> courses = generateCourses();
+        List<CourseDTO> courses = generateCourses();
         saveCoursesToDatabase(courses);
     }
 
-    private List<Course> generateCourses() {
+    private List<CourseDTO> generateCourses() {
         return coursesGenerator.getCoursesList();
     }
 
-    private void saveCoursesToDatabase(List<Course> courses) {
+    private void saveCoursesToDatabase(List<CourseDTO> courses) {
         courseService.addCourses(courses);
     }
 }

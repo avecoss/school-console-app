@@ -1,7 +1,8 @@
 package dev.alexcoss.console.actions;
 
 import dev.alexcoss.console.CommandInputScanner;
-import dev.alexcoss.model.Course;
+import dev.alexcoss.dto.CourseDTO;
+import dev.alexcoss.dto.StudentDTO;
 import dev.alexcoss.model.Student;
 import dev.alexcoss.service.StudentCourseService;
 
@@ -12,7 +13,7 @@ import java.util.Scanner;
 public class StudentInCourseProcessor {
 
     public static void processStudentInCourse(Scanner scanner, CommandInputScanner inputScanner, String actionName) {
-        List<Course> courses = inputScanner.getCourseService().getCourses();
+        List<CourseDTO> courses = inputScanner.getCourseService().getCourses();
         CoursePrinter.printListOfCourses(courses);
         scanner.nextLine();
 
@@ -22,8 +23,8 @@ public class StudentInCourseProcessor {
         if (scanner.hasNextInt()) {
             int studentId = scanner.nextInt();
 
-            Optional<Student> optionalStudent = inputScanner.getStudentService().getStudentById(studentId);
-            Optional<Course> optionalCourse = findCourseByName(inputCourseName, courses);
+            Optional<StudentDTO> optionalStudent = inputScanner.getStudentService().getStudentById(studentId);
+            Optional<CourseDTO> optionalCourse = findCourseByName(inputCourseName, courses);
 
             if (optionalStudent.isEmpty()) {
                 System.out.println("Student not found. Please enter a valid student ID.");
@@ -42,7 +43,7 @@ public class StudentInCourseProcessor {
         scanner.nextLine();
     }
 
-    private static void executeAction(CommandInputScanner inputScanner, String actionName, Student student, Course course, String inputCourseName) {
+    private static void executeAction(CommandInputScanner inputScanner, String actionName, StudentDTO student, CourseDTO course, String inputCourseName) {
         boolean isAddAction = "add".equals(actionName);
 
         StudentCourseService studentCourseService = inputScanner.getStudentCourseService();
@@ -66,7 +67,7 @@ public class StudentInCourseProcessor {
         return scanner.nextLine();
     }
 
-    private static Optional<Course> findCourseByName(String inputCourseName, List<Course> courses) {
+    private static Optional<CourseDTO> findCourseByName(String inputCourseName, List<CourseDTO> courses) {
         return courses.stream()
             .filter(c -> c.getName().equalsIgnoreCase(inputCourseName))
             .findFirst();

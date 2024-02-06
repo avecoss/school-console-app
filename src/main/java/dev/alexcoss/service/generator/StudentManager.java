@@ -1,5 +1,7 @@
 package dev.alexcoss.service.generator;
 
+import dev.alexcoss.dto.GroupDTO;
+import dev.alexcoss.dto.StudentDTO;
 import dev.alexcoss.model.Group;
 import dev.alexcoss.model.Student;
 import dev.alexcoss.service.GroupService;
@@ -27,25 +29,25 @@ public class StudentManager {
     }
 
     public void generateAndSaveStudentsToDatabase() {
-        List<Student> students = generateStudents();
-        List<Group> groupsFromDatabase = getGroupsFromDatabase();
-        List<Student> studentsInGroups = assignStudentsToGroups(students, groupsFromDatabase);
+        List<StudentDTO> students = generateStudents();
+        List<GroupDTO> groupsFromDatabase = getGroupsFromDatabase();
+        List<StudentDTO> studentsInGroups = assignStudentsToGroups(students, groupsFromDatabase);
         saveStudentsToDatabase(studentsInGroups);
     }
 
-    private List<Student> generateStudents() {
+    private List<StudentDTO> generateStudents() {
         return studentGenerator.generateStudents();
     }
 
-    private List<Group> getGroupsFromDatabase() {
+    private List<GroupDTO> getGroupsFromDatabase() {
         return groupService.getGroups();
     }
 
-    private List<Student> assignStudentsToGroups(List<Student> students, List<Group> groups) {
+    private List<StudentDTO> assignStudentsToGroups(List<StudentDTO> students, List<GroupDTO> groups) {
         return groupRandomizer.assignStudentsToGroups(students, groups);
     }
 
-    private void saveStudentsToDatabase(List<Student> students) {
+    private void saveStudentsToDatabase(List<StudentDTO> students) {
         studentService.addStudents(students);
     }
 }

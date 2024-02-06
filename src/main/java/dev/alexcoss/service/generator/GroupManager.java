@@ -1,6 +1,6 @@
 package dev.alexcoss.service.generator;
 
-import dev.alexcoss.model.Group;
+import dev.alexcoss.dto.GroupDTO;
 import dev.alexcoss.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,15 +19,15 @@ public class GroupManager {
     }
 
     public void generateAndSaveGroupsToDatabase() {
-        List<Group> groups = generateGroups();
+        List<GroupDTO> groups = generateGroups();
         saveGroupsToDatabase(groups);
     }
 
-    private List<Group> generateGroups() {
+    private List<GroupDTO> generateGroups() {
         return groupsGenerator.generateGroupList();
     }
 
-    private void saveGroupsToDatabase(List<Group> groups) {
+    private void saveGroupsToDatabase(List<GroupDTO> groups) {
         groupService.addGroups(groups);
     }
 }

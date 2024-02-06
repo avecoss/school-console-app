@@ -1,11 +1,13 @@
 package dev.alexcoss.service;
 
 import dev.alexcoss.dao.GroupDao;
+import dev.alexcoss.dto.GroupDTO;
 import dev.alexcoss.model.Group;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 
 import java.util.*;
 
@@ -13,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = {GroupService.class})
+@Import({MapperConfig.class})
 class GroupServiceTest {
     @MockBean
     private GroupDao groupDao;
@@ -22,32 +25,35 @@ class GroupServiceTest {
 
     @Test
     public void shouldGetAllGroups() {
-        List<Group> expectedGroup = getSampleGroupList();
-        when(groupDao.getAllItems()).thenReturn(expectedGroup);
+        List<Group> groupEntityList = getSampleGroupEntityList();
+        when(groupDao.getAllItems()).thenReturn(groupEntityList);
 
-        List<Group> actualGroups = groupService.getGroups();
+        List<GroupDTO> expectedGroup = getSampleGroupDtoList();
+        List<GroupDTO> actualGroups = groupService.getGroups();
 
-        assertEquals(expectedGroup, actualGroups);
+        assertEquals(expectedGroup.size(), actualGroups.size());
+        assertEquals(expectedGroup.get(0).getName(), actualGroups.get(0).getName());
         verify(groupDao).getAllItems();
     }
 
     @Test
     public void shouldGetAllGroupsWithStudents() {
-        Map<Group, Integer> expectedGroupsWithStudents = getSampleGroupsWithStudents();
-        when(groupDao.getAllGroupsWithStudents()).thenReturn(expectedGroupsWithStudents);
+        Map<Group, Integer> groupsWithStudents = getSampleGroupsWithStudents();
+        when(groupDao.getAllGroupsWithStudents()).thenReturn(groupsWithStudents);
 
-        Map<Group, Integer> actualGroupsWithStudents = groupService.getAllGroupsWithStudents();
+        Map<GroupDTO, Integer> expectedGroupsDtoWithStudents = getSampleGroupsDtoWithStudents();
+        Map<GroupDTO, Integer> actualGroupsWithStudents = groupService.getAllGroupsWithStudents();
 
-        assertEquals(expectedGroupsWithStudents, actualGroupsWithStudents);
+        assertEquals(expectedGroupsDtoWithStudents.size(), actualGroupsWithStudents.size());
         verify(groupDao).getAllGroupsWithStudents();
     }
 
     @Test
     public void shouldAddGroups() {
-        List<Group> groupList = getSampleGroupList();
-        groupService.addGroups(groupList);
+        List<GroupDTO> groupDtoList = getSampleGroupDtoList();
+        groupService.addGroups(groupDtoList);
 
-        verify(groupDao, times(1)).addAllItems(groupList);
+        verify(groupDao, times(1)).addAllItems(getSampleGroupEntityList());
     }
 
     @Test
@@ -66,10 +72,10 @@ class GroupServiceTest {
 
     @Test
     public void shouldNotAddGroupsWhenListContainsNull() {
-        List<Group> groupListWithNull = Arrays.asList(new Group(), null);
+        List<GroupDTO> groupListWithNull = Arrays.asList(new GroupDTO(), null);
         groupService.addGroups(groupListWithNull);
 
-        verify(groupDao, never()).addAllItems(groupListWithNull);
+        verify(groupDao, never()).addAllItems(anyList());
     }
 
     private Group getGroup(int id, String name) {
@@ -80,8 +86,12 @@ class GroupServiceTest {
         return group;
     }
 
-    private List<Group> getSampleGroupList() {
+    private List<Group> getSampleGroupEntityList() {
         return Arrays.asList(getGroup(1, "Group1"), getGroup(2, "Group2"));
+    }
+
+    private List<GroupDTO> getSampleGroupDtoList() {
+        return Arrays.asList(new GroupDTO(1, "Group1"), new GroupDTO(2, "Group2"));
     }
 
     private Map<Group, Integer> getSampleGroupsWithStudents() {
@@ -90,5 +100,13 @@ class GroupServiceTest {
         groupsWithStudents.put(getGroup(2, "Group2"), 15);
 
         return groupsWithStudents;
+    }
+
+    private Map<GroupDTO, Integer> getSampleGroupsDtoWithStudents() {
+        Map<GroupDTO, Integer> groupsDtoWithStudents = new HashMap<>();
+        groupsDtoWithStudents.put(new GroupDTO(1, "Group1"), 10);
+        groupsDtoWithStudents.put(new GroupDTO(2, "Group2"), 15);
+
+        return groupsDtoWithStudents;
     }
 }

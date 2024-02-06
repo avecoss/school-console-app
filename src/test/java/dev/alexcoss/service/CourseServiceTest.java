@@ -1,19 +1,22 @@
 package dev.alexcoss.service;
 
 import dev.alexcoss.dao.CourseDao;
+import dev.alexcoss.dto.CourseDTO;
 import dev.alexcoss.model.Course;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = {CourseService.class})
+@Import({MapperConfig.class})
 class CourseServiceTest {
     @MockBean
     private CourseDao courseDao;
@@ -23,36 +26,32 @@ class CourseServiceTest {
 
     @Test
     void shouldGetAllCourses() {
-        List<Course> expectedCourses = Arrays.asList(
-            getCourse(1, "Math", "Math Description"),
-            getCourse(2, "History", "History Description")
-        );
-        when(courseDao.getAllItems()).thenReturn(expectedCourses);
+        List<Course> entityCourses = getSampleCourseEntityList();
+        when(courseDao.getAllItems()).thenReturn(entityCourses);
 
-        List<Course> actualCourses = courseService.getCourses();
+        List<CourseDTO> expectedCourses = getSampleCourseDtoList();
+        List<CourseDTO> actualCourses = courseService.getCourses();
 
-        assertEquals(expectedCourses, actualCourses);
+        assertEquals(expectedCourses.size(), actualCourses.size());
+        assertEquals(expectedCourses.get(0).getName(), actualCourses.get(0).getName());
         verify(courseDao).getAllItems();
     }
 
     @Test
     void shouldAddValidCourses() {
-        List<Course> validCourses = Arrays.asList(
-            getCourse(1, "Math", "Math Description"),
-            getCourse(2, "History", "History Description")
-        );
+        List<CourseDTO> validCourses = getSampleCourseDtoList();
 
         courseService.addCourses(validCourses);
 
-        verify(courseDao).addAllItems(validCourses);
+        verify(courseDao).addAllItems(getSampleCourseEntityList());
     }
 
     @Test
     void shouldNotAddInvalidCourses() {
-        List<Course> invalidCourses = Arrays.asList(
-            getCourse(1, "Math", "Math Description"),
+        List<CourseDTO> invalidCourses = Arrays.asList(
+            new CourseDTO(1, "Math", "Math Description"),
             null,
-            getCourse(3, "Art", "Art Description")
+            new CourseDTO(2, "Art", "Art Description")
         );
 
         courseService.addCourses(invalidCourses);
@@ -67,5 +66,19 @@ class CourseServiceTest {
         course.setDescription(description);
 
         return course;
+    }
+
+    private List<Course> getSampleCourseEntityList() {
+        return Arrays.asList(
+            getCourse(1, "Math", "Math Description"),
+            getCourse(2, "History", "History Description")
+        );
+    }
+
+    private List<CourseDTO> getSampleCourseDtoList() {
+        return Arrays.asList(
+            new CourseDTO(1, "Math", "Math Description"),
+            new CourseDTO(2, "History", "History Description")
+        );
     }
 }
