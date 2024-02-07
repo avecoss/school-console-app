@@ -2,20 +2,20 @@ package dev.alexcoss.service;
 
 import dev.alexcoss.dao.GroupDao;
 import dev.alexcoss.dto.GroupDTO;
+import dev.alexcoss.mapper.GroupMapper;
 import dev.alexcoss.model.Group;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = {GroupService.class})
-@Import({MapperConfig.class})
+@SpringBootTest(classes = {GroupService.class, GroupMapper.class, ModelMapper.class})
 class GroupServiceTest {
     @MockBean
     private GroupDao groupDao;

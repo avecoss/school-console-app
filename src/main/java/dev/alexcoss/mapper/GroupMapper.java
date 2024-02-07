@@ -2,17 +2,40 @@ package dev.alexcoss.mapper;
 
 import dev.alexcoss.dto.GroupDTO;
 import dev.alexcoss.model.Group;
-import org.mapstruct.Mapper;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
-public interface GroupMapper {
-    GroupDTO mapToDTO(Group group);
+@Component
+public class GroupMapper {
 
-    Group mapToEntity(GroupDTO groupDTO);
+    private final ModelMapper modelMapper;
 
-    List<GroupDTO> mapToDTOList(List<Group> groupList);
+    @Autowired
+    public GroupMapper(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
+    }
 
-    List<Group> mapToEntityList(List<GroupDTO> groupDTOList);
+    public GroupDTO mapToDTO(Group group) {
+        return modelMapper.map(group, GroupDTO.class);
+    }
+
+    public Group mapToEntity(GroupDTO groupDTO) {
+        return modelMapper.map(groupDTO, Group.class);
+    }
+
+    public List<GroupDTO> mapToDTOList(List<Group> groupList) {
+        return groupList.stream()
+            .map(group -> modelMapper.map(group, GroupDTO.class))
+            .collect(Collectors.toList());
+    }
+
+    public List<Group> mapToEntityList(List<GroupDTO> groupDTOList) {
+        return groupDTOList.stream()
+            .map(groupDTO -> modelMapper.map(groupDTO, Group.class))
+            .collect(Collectors.toList());
+    }
 }

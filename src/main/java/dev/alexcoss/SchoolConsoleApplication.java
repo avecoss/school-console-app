@@ -3,6 +3,7 @@ package dev.alexcoss;
 import dev.alexcoss.console.CommandInputScanner;
 import dev.alexcoss.console.DatabaseConsoleManager;
 import dev.alexcoss.service.generator.GenerateStartingData;
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,5 +27,10 @@ public class SchoolConsoleApplication {
             List<String> commands = console.initializeCommands();
             inputScanner.scannerRun(commands);
         };
+    }
+
+    @Bean
+    public ModelMapper modelMapper(){
+        return new ModelMapper();
     }
 }

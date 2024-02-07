@@ -2,18 +2,40 @@ package dev.alexcoss.mapper;
 
 import dev.alexcoss.dto.StudentDTO;
 import dev.alexcoss.model.Student;
-import org.mapstruct.Mapper;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
-public interface StudentMapper {
-    StudentDTO mapToDTO(Student student);
+@Component
+public class StudentMapper {
 
-    Student mapToEntity(StudentDTO studentDTO);
+    private final ModelMapper modelMapper;
 
-    List<StudentDTO> mapToDTOList(List<Student> studentList);
+    @Autowired
+    public StudentMapper(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
+    }
 
-    List<Student> mapToEntityList(List<StudentDTO> studentDTOList);
+    public StudentDTO mapToDTO(Student student) {
+        return modelMapper.map(student, StudentDTO.class);
+    }
 
+    public Student mapToEntity(StudentDTO studentDTO) {
+        return modelMapper.map(studentDTO, Student.class);
+    }
+
+    public List<StudentDTO> mapToDTOList(List<Student> studentList) {
+        return studentList.stream()
+            .map(student -> modelMapper.map(student, StudentDTO.class))
+            .collect(Collectors.toList());
+    }
+
+    public List<Student> mapToEntityList(List<StudentDTO> studentDTOList) {
+        return studentDTOList.stream()
+            .map(studentDTO -> modelMapper.map(studentDTO, Student.class))
+            .collect(Collectors.toList());
+    }
 }

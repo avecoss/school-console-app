@@ -2,20 +2,20 @@ package dev.alexcoss.service;
 
 import dev.alexcoss.dao.StudentDao;
 import dev.alexcoss.dto.StudentDTO;
+import dev.alexcoss.mapper.StudentMapper;
 import dev.alexcoss.model.Student;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = {StudentService.class})
-@Import({MapperConfig.class})
+@SpringBootTest(classes = {StudentService.class, StudentMapper.class, ModelMapper.class})
 class StudentServiceTest {
     @MockBean
     private StudentDao studentDao;
