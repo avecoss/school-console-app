@@ -6,7 +6,7 @@ import java.util.List;
 
 public class CoursePrinter {
 
-    public static void printListOfCourses(List<CourseDTO> courses) {
+    public void printListOfCourses(List<CourseDTO> courses) {
         System.out.println("List of courses: ");
         courses.forEach(course -> {
             System.out.println(course.getName());

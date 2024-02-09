@@ -29,25 +29,9 @@ public class StudentManager {
     }
 
     public void generateAndSaveStudentsToDatabase() {
-        List<StudentDTO> students = generateStudents();
-        List<GroupDTO> groupsFromDatabase = getGroupsFromDatabase();
-        List<StudentDTO> studentsInGroups = assignStudentsToGroups(students, groupsFromDatabase);
-        saveStudentsToDatabase(studentsInGroups);
-    }
-
-    private List<StudentDTO> generateStudents() {
-        return studentGenerator.generateStudents();
-    }
-
-    private List<GroupDTO> getGroupsFromDatabase() {
-        return groupService.getGroups();
-    }
-
-    private List<StudentDTO> assignStudentsToGroups(List<StudentDTO> students, List<GroupDTO> groups) {
-        return groupRandomizer.assignStudentsToGroups(students, groups);
-    }
-
-    private void saveStudentsToDatabase(List<StudentDTO> students) {
-        studentService.addStudents(students);
+        List<StudentDTO> students = studentGenerator.generateStudents();
+        List<GroupDTO> groupsFromDatabase = groupService.getGroups();
+        List<StudentDTO> studentsInGroups = groupRandomizer.assignStudentsToGroups(students, groupsFromDatabase);
+        studentService.addStudents(studentsInGroups);
     }
 }

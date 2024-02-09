@@ -2,7 +2,6 @@ package dev.alexcoss.service;
 
 import dev.alexcoss.dao.GroupDao;
 import dev.alexcoss.dto.GroupDTO;
-import dev.alexcoss.mapper.GroupMapper;
 import dev.alexcoss.model.Group;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -15,7 +14,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = {GroupService.class, GroupMapper.class, ModelMapper.class})
+@SpringBootTest(classes = {GroupService.class, ModelMapper.class})
 class GroupServiceTest {
     @MockBean
     private GroupDao groupDao;

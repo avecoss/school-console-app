@@ -12,9 +12,11 @@ import java.util.Scanner;
 
 public class StudentInCourseProcessor {
 
-    public static void processStudentInCourse(Scanner scanner, CommandInputScanner inputScanner, String actionName) {
+    public void processStudentInCourse(Scanner scanner, CommandInputScanner inputScanner, String actionName) {
+        CoursePrinter coursePrinter = new CoursePrinter();
+
         List<CourseDTO> courses = inputScanner.getCourseService().getCourses();
-        CoursePrinter.printListOfCourses(courses);
+        coursePrinter.printListOfCourses(courses);
         scanner.nextLine();
 
         String inputCourseName = getCourseName(scanner);
@@ -43,7 +45,7 @@ public class StudentInCourseProcessor {
         scanner.nextLine();
     }
 
-    private static void executeAction(CommandInputScanner inputScanner, String actionName, StudentDTO student, CourseDTO course, String inputCourseName) {
+    private void executeAction(CommandInputScanner inputScanner, String actionName, StudentDTO student, CourseDTO course, String inputCourseName) {
         boolean isAddAction = "add".equals(actionName);
 
         StudentCourseService studentCourseService = inputScanner.getStudentCourseService();
@@ -62,12 +64,12 @@ public class StudentInCourseProcessor {
             inputCourseName);
     }
 
-    private static String getCourseName(Scanner scanner) {
+    private String getCourseName(Scanner scanner) {
         System.out.print("Enter the course name: ");
         return scanner.nextLine();
     }
 
-    private static Optional<CourseDTO> findCourseByName(String inputCourseName, List<CourseDTO> courses) {
+    private Optional<CourseDTO> findCourseByName(String inputCourseName, List<CourseDTO> courses) {
         return courses.stream()
             .filter(c -> c.getName().equalsIgnoreCase(inputCourseName))
             .findFirst();

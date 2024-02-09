@@ -19,15 +19,7 @@ public class GroupManager {
     }
 
     public void generateAndSaveGroupsToDatabase() {
-        List<GroupDTO> groups = generateGroups();
-        saveGroupsToDatabase(groups);
-    }
-
-    private List<GroupDTO> generateGroups() {
-        return groupsGenerator.generateGroupList();
-    }
-
-    private void saveGroupsToDatabase(List<GroupDTO> groups) {
+        List<GroupDTO> groups = groupsGenerator.generateGroupList();
         groupService.addGroups(groups);
     }
 }

@@ -19,15 +19,7 @@ public class CourseManager {
     }
 
     public void generateAndSaveCoursesToDatabase() {
-        List<CourseDTO> courses = generateCourses();
-        saveCoursesToDatabase(courses);
-    }
-
-    private List<CourseDTO> generateCourses() {
-        return coursesGenerator.getCoursesList();
-    }
-
-    private void saveCoursesToDatabase(List<CourseDTO> courses) {
+        List<CourseDTO> courses = coursesGenerator.getCoursesList();
         courseService.addCourses(courses);
     }
 }

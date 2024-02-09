@@ -30,25 +30,9 @@ public class StudentsCoursesManager {
     }
 
     public void assignStudentsToCoursesAndSave() {
-        List<StudentDTO> studentsFromDatabase = getStudentsFromDatabase();
-        List<CourseDTO> coursesFromDatabase = getCoursesFromDatabase();
-        Map<Integer, Set<Integer>> mapStudentCourses = assignStudentsToCourse(studentsFromDatabase, coursesFromDatabase);
-        saveCoursesToDatabase(mapStudentCourses);
-    }
-
-    private List<StudentDTO> getStudentsFromDatabase() {
-        return studentService.getStudents();
-    }
-
-    private List<CourseDTO> getCoursesFromDatabase() {
-        return courseService.getCourses();
-    }
-
-    private Map<Integer, Set<Integer>> assignStudentsToCourse(List<StudentDTO> students, List<CourseDTO> courses) {
-        return courseRandomizer.assignStudentsToCourse(students, courses);
-    }
-
-    private void saveCoursesToDatabase(Map<Integer, Set<Integer>> mapStudentCourses) {
+        List<StudentDTO> studentsFromDatabase = studentService.getStudents();
+        List<CourseDTO> coursesFromDatabase = courseService.getCourses();
+        Map<Integer, Set<Integer>> mapStudentCourses = courseRandomizer.assignStudentsToCourse(studentsFromDatabase, coursesFromDatabase);
         studentCourseService.addAllStudentCourseRelationships(mapStudentCourses);
     }
 }

@@ -2,7 +2,6 @@ package dev.alexcoss.service;
 
 import dev.alexcoss.dao.CourseDao;
 import dev.alexcoss.dto.CourseDTO;
-import dev.alexcoss.mapper.CourseMapper;
 import dev.alexcoss.model.Course;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -16,7 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = {CourseService.class, CourseMapper.class, ModelMapper.class})
+@SpringBootTest(classes = {CourseService.class, ModelMapper.class})
 class CourseServiceTest {
     @MockBean
     private CourseDao courseDao;

@@ -13,6 +13,7 @@ public class AddStudentToCourseAction extends AbstractAction {
 
     @Override
     public void execute(Scanner scanner) {
-        StudentInCourseProcessor.processStudentInCourse(scanner, commandInputScanner, ACTION_NAME);
+        StudentInCourseProcessor processor = new StudentInCourseProcessor();
+        processor.processStudentInCourse(scanner, commandInputScanner, ACTION_NAME);
     }
 }

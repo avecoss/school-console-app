@@ -2,7 +2,8 @@ package dev.alexcoss.service;
 
 import dev.alexcoss.dao.GroupDao;
 import dev.alexcoss.dto.GroupDTO;
-import dev.alexcoss.mapper.GroupMapper;
+import dev.alexcoss.model.Group;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,17 +15,20 @@ import java.util.stream.Collectors;
 public class GroupService extends AbstractService {
 
     private GroupDao groupRepository;
-    private GroupMapper groupMapper;
+    private ModelMapper modelMapper;
 
     @Autowired
-    public GroupService(GroupDao groupRepository, GroupMapper groupMapper) {
+    public GroupService(GroupDao groupRepository, ModelMapper modelMapper) {
         super(GroupService.class.getName());
         this.groupRepository = groupRepository;
-        this.groupMapper = groupMapper;
+        this.modelMapper = modelMapper;
     }
 
     public List<GroupDTO> getGroups() {
-        return groupMapper.mapToDTOList(groupRepository.getAllItems());
+        List<Group> groups = groupRepository.getAllItems();
+        return groups.stream()
+            .map(group -> modelMapper.map(group, GroupDTO.class))
+            .toList();
     }
 
     public Map<GroupDTO, Integer> getAllGroupsWithStudents() {
@@ -32,14 +36,18 @@ public class GroupService extends AbstractService {
             .entrySet()
             .stream()
             .collect(Collectors.toMap(
-                entry -> groupMapper.mapToDTO(entry.getKey()),
+                entry -> modelMapper.map(entry.getKey(), GroupDTO.class),
                 Map.Entry::getValue
             ));
     }
 
     public void addGroups(List<GroupDTO> groupList) {
         if (isValidGroupList(groupList)) {
-            groupRepository.addAllItems(groupMapper.mapToEntityList(groupList));
+            List<Group> groups = groupList.stream()
+                .map(groupDTO -> modelMapper.map(groupDTO, Group.class))
+                .toList();
+
+            groupRepository.addAllItems(groups);
         }
     }
 

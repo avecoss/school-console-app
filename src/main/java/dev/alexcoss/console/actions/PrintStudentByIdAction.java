@@ -15,7 +15,8 @@ public class PrintStudentByIdAction extends AbstractAction {
 
     @Override
     public void execute(Scanner scanner) {
-        StudentProcessor.processStudentById(scanner, studentId -> {
+        StudentProcessor processor = new StudentProcessor();
+        processor.processStudentById(scanner, studentId -> {
                 Optional<StudentDTO> optional = commandInputScanner.getStudentService().getStudentById(studentId);
                 if (optional.isPresent()) {
                     System.out.println("Student: " + optional.get());

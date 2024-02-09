@@ -12,7 +12,9 @@ public class DeleteStudentByIdAction extends AbstractAction {
 
     @Override
     public void execute(Scanner scanner) {
+        StudentProcessor processor = new StudentProcessor();
         StudentService studentService = commandInputScanner.getStudentService();
-        StudentProcessor.processStudentById(scanner, studentService::removeStudentById, "Executing command 4: Delete a student by ID: ");
+
+        processor.processStudentById(scanner, studentService::removeStudentById, "Executing command 4: Delete a student by ID: ");
     }
 }

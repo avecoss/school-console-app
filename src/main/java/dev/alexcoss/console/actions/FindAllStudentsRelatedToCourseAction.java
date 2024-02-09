@@ -14,8 +14,9 @@ public class FindAllStudentsRelatedToCourseAction extends AbstractAction {
 
     @Override
     public void execute(Scanner scanner) {
+        CoursePrinter coursePrinter = new CoursePrinter();
         List<CourseDTO> courses = commandInputScanner.getCourseService().getCourses();
-        CoursePrinter.printListOfCourses(courses);
+        coursePrinter.printListOfCourses(courses);
 
         scanner.nextLine();
 
