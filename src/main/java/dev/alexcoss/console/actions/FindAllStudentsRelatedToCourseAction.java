@@ -5,7 +5,6 @@ import dev.alexcoss.dto.CourseDTO;
 import dev.alexcoss.dto.StudentDTO;
 
 import java.util.List;
-import java.util.Scanner;
 
 public class FindAllStudentsRelatedToCourseAction extends AbstractAction {
     public FindAllStudentsRelatedToCourseAction(CommandInputScanner commandInputScanner) {
@@ -13,12 +12,10 @@ public class FindAllStudentsRelatedToCourseAction extends AbstractAction {
     }
 
     @Override
-    public void execute(Scanner scanner) {
+    public void execute() {
         CoursePrinter coursePrinter = new CoursePrinter();
         List<CourseDTO> courses = commandInputScanner.getCourseService().getCourses();
         coursePrinter.printListOfCourses(courses);
-
-        scanner.nextLine();
 
         System.out.print("Enter the course name: ");
         String courseName = scanner.nextLine();

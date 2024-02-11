@@ -20,7 +20,6 @@ public class StudentsCoursesManager {
     private final StudentService studentService;
     private final CourseService courseService;
 
-    @Autowired
     public StudentsCoursesManager(CourseRandomizer courseRandomizer, StudentCourseService studentCourseService,
                                   StudentService studentService, CourseService courseService) {
         this.courseRandomizer = courseRandomizer;

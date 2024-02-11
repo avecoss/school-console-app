@@ -12,7 +12,6 @@ public class CourseManager {
     private final CourseService courseService;
     private final CoursesGenerator coursesGenerator;
 
-    @Autowired
     public CourseManager(CourseService courseService, CoursesGenerator coursesGenerator) {
         this.courseService = courseService;
         this.coursesGenerator = coursesGenerator;

@@ -19,7 +19,6 @@ public class CourseDao extends AbstractDao<Course, List<Course>> {
     private static final String INSERT_SQL = "INSERT INTO courses (course_name, course_description) VALUES (?, ?)";
     private static final String SELECT_ALL_SQL = "SELECT * FROM courses";
 
-    @Autowired
     public CourseDao(JdbcTemplate jdbcTemplate) {
         super(CourseDao.class.getName(), jdbcTemplate);
     }

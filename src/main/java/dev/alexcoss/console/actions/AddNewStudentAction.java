@@ -11,8 +11,7 @@ public class AddNewStudentAction extends AbstractAction {
     }
 
     @Override
-    public void execute(Scanner scanner) {
-        scanner.nextLine();
+    public void execute() {
         StudentDTO student = new StudentDTO();
         System.out.print("Enter student first name: ");
         student.setFirstName(scanner.nextLine());

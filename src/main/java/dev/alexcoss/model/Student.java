@@ -37,7 +37,7 @@ public class Student {
     }
 
     public void setGroupId(Integer groupId) {
-        this.groupId = (groupId != -1) ? groupId : null;
+        this.groupId = (groupId != null && groupId != -1) ? groupId : null;
     }
 
     @Override

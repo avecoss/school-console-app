@@ -17,7 +17,6 @@ public class StudentService extends AbstractService {
     private StudentDao studentRepository;
     private ModelMapper modelMapper;
 
-    @Autowired
     public StudentService(StudentDao studentRepository, ModelMapper modelMapper) {
         super(StudentService.class.getName());
         this.studentRepository = studentRepository;

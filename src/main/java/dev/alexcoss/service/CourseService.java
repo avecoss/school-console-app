@@ -15,7 +15,6 @@ public class CourseService extends AbstractService {
     private CourseDao courseRepository;
     private ModelMapper modelMapper;
 
-    @Autowired
     public CourseService(CourseDao courseRepository, ModelMapper modelMapper) {
         super(CourseService.class.getName());
         this.courseRepository = courseRepository;

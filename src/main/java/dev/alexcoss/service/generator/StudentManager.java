@@ -19,7 +19,6 @@ public class StudentManager {
     private final StudentGenerator studentGenerator;
     private final GroupService groupService;
 
-    @Autowired
     public StudentManager(StudentService studentService, GroupRandomizer groupRandomizer,
                           StudentGenerator studentGenerator, GroupService groupService) {
         this.studentService = studentService;

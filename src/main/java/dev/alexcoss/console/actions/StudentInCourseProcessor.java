@@ -3,7 +3,6 @@ package dev.alexcoss.console.actions;
 import dev.alexcoss.console.CommandInputScanner;
 import dev.alexcoss.dto.CourseDTO;
 import dev.alexcoss.dto.StudentDTO;
-import dev.alexcoss.model.Student;
 import dev.alexcoss.service.StudentCourseService;
 
 import java.util.List;
@@ -17,7 +16,6 @@ public class StudentInCourseProcessor {
 
         List<CourseDTO> courses = inputScanner.getCourseService().getCourses();
         coursePrinter.printListOfCourses(courses);
-        scanner.nextLine();
 
         String inputCourseName = getCourseName(scanner);
 

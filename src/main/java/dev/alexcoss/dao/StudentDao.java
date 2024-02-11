@@ -2,9 +2,7 @@ package dev.alexcoss.dao;
 
 import dev.alexcoss.mapper.StudentRowMapper;
 import dev.alexcoss.model.Student;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -30,7 +28,6 @@ public class StudentDao extends AbstractDao<Student, List<Student>> {
         "         JOIN students as s ON sc.student_id = s.student_id\n" +
         "WHERE c.course_name = ?";
 
-    @Autowired
     public StudentDao(JdbcTemplate jdbcTemplate) {
         super(StudentDao.class.getName(), jdbcTemplate);
     }

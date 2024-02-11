@@ -2,7 +2,6 @@ package dev.alexcoss.dao;
 
 import dev.alexcoss.mapper.GroupRowMapper;
 import dev.alexcoss.model.Group;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -27,7 +26,6 @@ public class GroupDao extends AbstractDao<Group, List<Group>> {
         "      GROUP BY s.group_id, g.group_name\n" +
         "      ORDER BY num_students;";
 
-    @Autowired
     public GroupDao(JdbcTemplate jdbcTemplate) {
         super(GroupDao.class.getName(), jdbcTemplate);
     }

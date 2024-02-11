@@ -2,10 +2,8 @@ package dev.alexcoss.console.actions;
 
 import dev.alexcoss.console.CommandInputScanner;
 import dev.alexcoss.dto.StudentDTO;
-import dev.alexcoss.model.Student;
 
 import java.util.Optional;
-import java.util.Scanner;
 
 public class PrintStudentByIdAction extends AbstractAction {
 
@@ -14,7 +12,7 @@ public class PrintStudentByIdAction extends AbstractAction {
     }
 
     @Override
-    public void execute(Scanner scanner) {
+    public void execute() {
         StudentProcessor processor = new StudentProcessor();
         processor.processStudentById(scanner, studentId -> {
                 Optional<StudentDTO> optional = commandInputScanner.getStudentService().getStudentById(studentId);

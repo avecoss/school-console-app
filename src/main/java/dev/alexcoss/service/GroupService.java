@@ -17,7 +17,6 @@ public class GroupService extends AbstractService {
     private GroupDao groupRepository;
     private ModelMapper modelMapper;
 
-    @Autowired
     public GroupService(GroupDao groupRepository, ModelMapper modelMapper) {
         super(GroupService.class.getName());
         this.groupRepository = groupRepository;

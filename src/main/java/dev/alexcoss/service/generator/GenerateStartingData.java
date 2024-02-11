@@ -13,7 +13,6 @@ public class GenerateStartingData {
     private final StudentsCoursesManager studentsCoursesManager;
     private final TableValidator tableValidator;
 
-    @Autowired
     public GenerateStartingData(GroupManager groupManager, CourseManager courseManager, StudentManager studentManager,
                                 StudentsCoursesManager studentsCoursesManager, EmptyTableChecker tableValidator) {
         this.groupManager = groupManager;

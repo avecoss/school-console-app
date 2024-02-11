@@ -3,15 +3,13 @@ package dev.alexcoss.console.actions;
 import dev.alexcoss.console.CommandInputScanner;
 import dev.alexcoss.service.StudentService;
 
-import java.util.Scanner;
-
 public class DeleteStudentByIdAction extends AbstractAction {
     public DeleteStudentByIdAction(CommandInputScanner commandInputScanner) {
         super(commandInputScanner);
     }
 
     @Override
-    public void execute(Scanner scanner) {
+    public void execute() {
         StudentProcessor processor = new StudentProcessor();
         StudentService studentService = commandInputScanner.getStudentService();
 

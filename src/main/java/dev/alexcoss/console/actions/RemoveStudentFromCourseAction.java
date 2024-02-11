@@ -12,7 +12,7 @@ public class RemoveStudentFromCourseAction extends AbstractAction {
     }
 
     @Override
-    public void execute(Scanner scanner) {
+    public void execute() {
         StudentInCourseProcessor processor = new StudentInCourseProcessor();
         processor.processStudentInCourse(scanner, commandInputScanner, ACTION_NAME);
     }

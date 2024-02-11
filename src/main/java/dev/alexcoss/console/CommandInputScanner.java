@@ -41,7 +41,7 @@ public class CommandInputScanner {
                 System.out.println("Enter a command:");
                 if (scanner.hasNextInt()) {
                     int number = scanner.nextInt();
-                    processIntegerInput(commandsCount, number, scanner);
+                    processIntegerInput(commandsCount, number);
                 } else {
                     String line = scanner.nextLine();
                     if (EXIT_COMMAND.equals(line)) {
@@ -70,18 +70,18 @@ public class CommandInputScanner {
         return studentCourseService;
     }
 
-    private void processIntegerInput(int commandsCount, int number, Scanner scanner) {
+    private void processIntegerInput(int commandsCount, int number) {
         if (number >= 0 && number <= commandsCount) {
-            executeCommand(number, scanner);
+            executeCommand(number);
         } else {
             System.out.println("Invalid command number. Please enter a valid command.");
         }
     }
 
-    private void executeCommand(int commandNumber, Scanner scanner) {
+    private void executeCommand(int commandNumber) {
         Action action = actions.get(commandNumber);
         if (action != null) {
-            action.execute(scanner);
+            action.execute();
         } else {
             System.out.println("Invalid command number. Please enter a valid command.");
         }

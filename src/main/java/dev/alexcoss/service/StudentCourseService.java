@@ -14,7 +14,6 @@ public class StudentCourseService extends AbstractService {
 
     private StudentsCoursesDao studentsCoursesRepository;
 
-    @Autowired
     public StudentCourseService(StudentsCoursesDao studentsCoursesRepository) {
         super(StudentCourseService.class.getName());
         this.studentsCoursesRepository = studentsCoursesRepository;

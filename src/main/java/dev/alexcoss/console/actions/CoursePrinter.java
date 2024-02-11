@@ -8,8 +8,7 @@ public class CoursePrinter {
 
     public void printListOfCourses(List<CourseDTO> courses) {
         System.out.println("List of courses: ");
-        courses.forEach(course -> {
-            System.out.println(course.getName());
-        });
+        courses.forEach(System.out::println);
     }
+
 }

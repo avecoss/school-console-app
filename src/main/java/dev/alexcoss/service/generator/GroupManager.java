@@ -12,7 +12,6 @@ public class GroupManager {
     private final GroupService groupService;
     private final GroupsGenerator groupsGenerator;
 
-    @Autowired
     public GroupManager(GroupService groupService, GroupsGenerator groupsGenerator) {
         this.groupService = groupService;
         this.groupsGenerator = groupsGenerator;
