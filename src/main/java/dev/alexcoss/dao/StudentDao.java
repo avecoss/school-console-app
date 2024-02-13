@@ -2,9 +2,7 @@ package dev.alexcoss.dao;
 
 import dev.alexcoss.mapper.StudentRowMapper;
 import dev.alexcoss.model.Student;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -14,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class StudentDao extends AbstractDao<Student, List<Student>> {
@@ -29,7 +28,6 @@ public class StudentDao extends AbstractDao<Student, List<Student>> {
         "         JOIN students as s ON sc.student_id = s.student_id\n" +
         "WHERE c.course_name = ?";
 
-    @Autowired
     public StudentDao(JdbcTemplate jdbcTemplate) {
         super(StudentDao.class.getName(), jdbcTemplate);
     }
@@ -37,8 +35,7 @@ public class StudentDao extends AbstractDao<Student, List<Student>> {
     @Override
     public void addItem(Student student) {
         try {
-            Integer groupId = getGroupId(student);
-            jdbcTemplate.update(INSERT_SQL, groupId, student.getFirstName(), student.getLastName());
+            jdbcTemplate.update(INSERT_SQL, student.getGroupId(), student.getFirstName(), student.getLastName());
         } catch (DataAccessException e) {
             handleSQLException(e, "Error adding student to database", INSERT_SQL, student);
         }
@@ -46,22 +43,20 @@ public class StudentDao extends AbstractDao<Student, List<Student>> {
 
     public void updateStudent(Student updateStudent) {
         try {
-            Integer groupId = getGroupId(updateStudent);
-            jdbcTemplate.update(UPDATE_SQL, groupId, updateStudent.getFirstName(), updateStudent.getLastName(), updateStudent.getId());
+            jdbcTemplate.update(UPDATE_SQL, updateStudent.getGroupId(), updateStudent.getFirstName(), updateStudent.getLastName(), updateStudent.getId());
         } catch (DataAccessException e) {
             handleSQLException(e, "Error updating student to database", UPDATE_SQL, updateStudent);
         }
     }
 
-    public Student getStudentById(int studentId) {
+    public Optional<Student> getStudentById(int studentId) {
         try {
             return jdbcTemplate.query(SELECT_BY_ID_SQL, new StudentRowMapper(), studentId)
                 .stream()
-                .findAny()
-                .orElseThrow(() -> new EmptyResultDataAccessException(studentId));
-        } catch (EmptyResultDataAccessException e) {
+                .findAny();
+        } catch (DataAccessException e) {
             handleSQLException(e, "Error getting student by id from database", SELECT_BY_ID_SQL, studentId);
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -90,9 +85,8 @@ public class StudentDao extends AbstractDao<Student, List<Student>> {
                 @Override
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
                     Student student = studentList.get(i);
-                    Integer groupId = (!student.getDefaultInteger().equals(student.getGroupId())) ? student.getGroupId() : null;
 
-                    ps.setObject(1, groupId, Types.INTEGER);
+                    ps.setObject(1, student.getGroupId(), Types.INTEGER);
                     ps.setString(2, student.getFirstName());
                     ps.setString(3, student.getLastName());
                 }
@@ -114,14 +108,6 @@ public class StudentDao extends AbstractDao<Student, List<Student>> {
             handleSQLException(e, "Error getting students by course from database", SELECT_STUDENTS_IN_COURSE_SQL);
             return Collections.emptyList();
         }
-    }
-
-    private Integer getGroupId(Student student) {
-        Integer groupId = null;
-        if (!student.getDefaultInteger().equals(student.getGroupId())) {
-            groupId = student.getGroupId();
-        }
-        return groupId;
     }
 }
 

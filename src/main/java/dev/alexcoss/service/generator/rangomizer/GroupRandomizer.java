@@ -1,7 +1,7 @@
-package dev.alexcoss.service;
+package dev.alexcoss.service.generator.rangomizer;
 
-import dev.alexcoss.model.Group;
-import dev.alexcoss.model.Student;
+import dev.alexcoss.dto.GroupDTO;
+import dev.alexcoss.dto.StudentDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -12,26 +12,26 @@ public class GroupRandomizer extends Randomizer {
     private static final int MIN_STUDENTS_IN_GROUP = 10;
     private static final int MAX_STUDENTS_IN_GROUP = 30;
 
-    public List<Student> assignStudentsToGroups(List<Student> students, List<Group> groups) {
+    public List<StudentDTO> assignStudentsToGroups(List<StudentDTO> students, List<GroupDTO> groups) {
         shuffleCollections(students, groups);
 
-        List<Student> studentsInGroups = new ArrayList<>();
+        List<StudentDTO> studentsInGroups = new ArrayList<>();
         distributeStudentsToGroups(students, groups, studentsInGroups);
         studentsInGroups.addAll(students);
 
         return studentsInGroups;
     }
 
-    private void distributeStudentsToGroups(List<Student> students, List<Group> groups, List<Student> studentsInGroups) {
-        for (Group group : groups) {
+    private void distributeStudentsToGroups(List<StudentDTO> students, List<GroupDTO> groups, List<StudentDTO> studentsInGroups) {
+        for (GroupDTO group : groups) {
             int groupSize = getRandomInteger(MAX_STUDENTS_IN_GROUP, MIN_STUDENTS_IN_GROUP);
             addStudentsToGroup(students, studentsInGroups, groupSize, group.getId());
         }
     }
 
-    private void addStudentsToGroup(List<Student> students, List<Student> studentsInGroups, int groupSize, int groupId) {
+    private void addStudentsToGroup(List<StudentDTO> students, List<StudentDTO> studentsInGroups, int groupSize, int groupId) {
         for (int i = 0; i < groupSize && !students.isEmpty(); i++) {
-            Student student = students.remove(0);
+            StudentDTO student = students.remove(0);
             student.setGroupId(groupId);
             studentsInGroups.add(student);
         }

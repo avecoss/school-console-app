@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 
 public class StudentProcessor {
 
-    public static void processStudentById(Scanner scanner, Consumer<Integer> action, String actionName) {
+    public void processStudentById(Scanner scanner, Consumer<Integer> action, String actionName) {
         System.out.print("Enter the student ID: ");
         if (scanner.hasNextInt()) {
             int studentId = scanner.nextInt();

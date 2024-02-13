@@ -1,5 +1,6 @@
-package dev.alexcoss.service;
+package dev.alexcoss.service.generator;
 
+import dev.alexcoss.dto.CourseDTO;
 import dev.alexcoss.model.Course;
 import dev.alexcoss.util.FileReader;
 import org.springframework.stereotype.Component;
@@ -12,17 +13,14 @@ import java.util.stream.Collectors;
 public class CoursesGenerator {
     private static final String COURSES_PATH = "src/main/resources/data/courses.txt";
 
-    public List<Course> getCoursesList() {
+    public List<CourseDTO> getCoursesList() {
         return readList().stream()
             .map(this::createCourse)
             .collect(Collectors.toList());
     }
 
-    private Course createCourse(String name) {
-        Course course = new Course();
-
-        course.setName(name);
-        return course;
+    private CourseDTO createCourse(String name) {
+        return new CourseDTO(name);
     }
 
     private List<String> readList() {

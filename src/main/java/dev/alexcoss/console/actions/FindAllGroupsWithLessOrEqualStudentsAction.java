@@ -1,12 +1,11 @@
 package dev.alexcoss.console.actions;
 
 import dev.alexcoss.console.CommandInputScanner;
-import dev.alexcoss.model.Group;
+import dev.alexcoss.dto.GroupDTO;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class FindAllGroupsWithLessOrEqualStudentsAction extends AbstractAction {
@@ -15,10 +14,10 @@ public class FindAllGroupsWithLessOrEqualStudentsAction extends AbstractAction {
     }
 
     @Override
-    public void execute(Scanner scanner) {
-        Map<Group, Integer> allGroupsWithStudents = commandInputScanner.getGroupDao().getAllGroupsWithStudents();
+    public void execute() {
+        Map<GroupDTO, Integer> allGroupsWithStudents = commandInputScanner.getGroupService().getAllGroupsWithStudents();
 
-        List<Map.Entry<Group, Integer>> minEntries = allGroupsWithStudents.entrySet().stream()
+        List<Map.Entry<GroupDTO, Integer>> minEntries = allGroupsWithStudents.entrySet().stream()
             .collect(Collectors.groupingBy(Map.Entry::getValue))
             .entrySet().stream()
             .min(Map.Entry.comparingByKey())

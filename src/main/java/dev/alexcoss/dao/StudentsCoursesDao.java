@@ -1,6 +1,5 @@
 package dev.alexcoss.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,7 +18,6 @@ public class StudentsCoursesDao extends AbstractDao<Map<Integer, Integer>, Map<I
     private static final String SELECT_ALL_SQL = "SELECT * FROM students_courses";
     private static final String NUMBER_OF_EXISTING_SQL = "SELECT COUNT(*) FROM students_courses WHERE student_id = ? AND course_id = ?";
 
-    @Autowired
     public StudentsCoursesDao(JdbcTemplate jdbcTemplate) {
         super(StudentsCoursesDao.class.getName(), jdbcTemplate);
     }

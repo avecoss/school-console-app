@@ -1,6 +1,6 @@
-package dev.alexcoss.service;
+package dev.alexcoss.service.generator;
 
-import dev.alexcoss.model.Group;
+import dev.alexcoss.dto.GroupDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -23,18 +23,18 @@ public class GroupsGenerator {
 
     private final Random random = new Random();
 
-    public List<Group> generateGroupList() {
-        List<Group> groupList = new ArrayList<>();
+    public List<GroupDTO> generateGroupList() {
+        List<GroupDTO> groupList = new ArrayList<>();
 
         for (int i = 0; i < groupCount; i++) {
-            Group group = generateRandomName();
+            GroupDTO group = generateRandomName();
             groupList.add(group);
         }
 
         return groupList;
     }
 
-    private Group generateRandomName() {
+    private GroupDTO generateRandomName() {
         StringBuilder nameBuilder = new StringBuilder();
 
         for (int i = 0; i < quantityCharacters; i++) {
@@ -47,7 +47,7 @@ public class GroupsGenerator {
             nameBuilder.append(generateRandomDigit());
         }
 
-        Group group = new Group();
+        GroupDTO group = new GroupDTO();
         group.setName(nameBuilder.toString());
 
         return group;

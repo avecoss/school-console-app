@@ -1,11 +1,10 @@
 package dev.alexcoss.console;
 
 import dev.alexcoss.console.actions.*;
-import dev.alexcoss.dao.CourseDao;
-import dev.alexcoss.dao.GroupDao;
-import dev.alexcoss.dao.StudentDao;
-import dev.alexcoss.dao.StudentsCoursesDao;
-import org.springframework.beans.factory.annotation.Autowired;
+import dev.alexcoss.service.CourseService;
+import dev.alexcoss.service.GroupService;
+import dev.alexcoss.service.StudentCourseService;
+import dev.alexcoss.service.StudentService;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -17,18 +16,17 @@ import java.util.Scanner;
 public class CommandInputScanner {
     private static final String EXIT_COMMAND = "exit";
 
-    private final StudentDao studentDao;
-    private final GroupDao groupDao;
-    private final CourseDao courseDao;
-    private final StudentsCoursesDao studentsCoursesDao;
+    private final StudentService studentService;
+    private final GroupService groupService;
+    private final CourseService courseService;
+    private final StudentCourseService studentCourseService;
     private final Map<Integer, Action> actions = new HashMap<>();
 
-    @Autowired
-    public CommandInputScanner(StudentDao studentDao, GroupDao groupDao, CourseDao courseDao, StudentsCoursesDao studentsCoursesDao) {
-        this.studentDao = studentDao;
-        this.groupDao = groupDao;
-        this.courseDao = courseDao;
-        this.studentsCoursesDao = studentsCoursesDao;
+    public CommandInputScanner(StudentService studentService, GroupService groupService, CourseService courseService, StudentCourseService studentCourseService) {
+        this.studentService = studentService;
+        this.groupService = groupService;
+        this.courseService = courseService;
+        this.studentCourseService = studentCourseService;
 
         populateActionsMap();
     }
@@ -43,7 +41,7 @@ public class CommandInputScanner {
                 System.out.println("Enter a command:");
                 if (scanner.hasNextInt()) {
                     int number = scanner.nextInt();
-                    processIntegerInput(commandsCount, number, scanner);
+                    processIntegerInput(commandsCount, number);
                 } else {
                     String line = scanner.nextLine();
                     if (EXIT_COMMAND.equals(line)) {
@@ -56,34 +54,34 @@ public class CommandInputScanner {
         }
     }
 
-    public StudentDao getStudentDao() {
-        return studentDao;
+    public StudentService getStudentService() {
+        return studentService;
     }
 
-    public GroupDao getGroupDao() {
-        return groupDao;
+    public GroupService getGroupService() {
+        return groupService;
     }
 
-    public CourseDao getCourseDao() {
-        return courseDao;
+    public CourseService getCourseService() {
+        return courseService;
     }
 
-    public StudentsCoursesDao getStudentsCoursesDao() {
-        return studentsCoursesDao;
+    public StudentCourseService getStudentCourseService() {
+        return studentCourseService;
     }
 
-    private void processIntegerInput(int commandsCount, int number, Scanner scanner) {
+    private void processIntegerInput(int commandsCount, int number) {
         if (number >= 0 && number <= commandsCount) {
-            executeCommand(number, scanner);
+            executeCommand(number);
         } else {
             System.out.println("Invalid command number. Please enter a valid command.");
         }
     }
 
-    private void executeCommand(int commandNumber, Scanner scanner) {
+    private void executeCommand(int commandNumber) {
         Action action = actions.get(commandNumber);
         if (action != null) {
-            action.execute(scanner);
+            action.execute();
         } else {
             System.out.println("Invalid command number. Please enter a valid command.");
         }

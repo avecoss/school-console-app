@@ -2,8 +2,6 @@ package dev.alexcoss.console.actions;
 
 import dev.alexcoss.console.CommandInputScanner;
 
-import java.util.Scanner;
-
 public class AddStudentToCourseAction extends AbstractAction {
     private static final String ACTION_NAME = "add";
 
@@ -12,7 +10,8 @@ public class AddStudentToCourseAction extends AbstractAction {
     }
 
     @Override
-    public void execute(Scanner scanner) {
-        StudentInCourseProcessor.processStudentInCourse(scanner, commandInputScanner, ACTION_NAME);
+    public void execute() {
+        StudentInCourseProcessor processor = new StudentInCourseProcessor();
+        processor.processStudentInCourse(scanner, commandInputScanner, ACTION_NAME);
     }
 }
