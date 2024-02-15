@@ -1,5 +1,7 @@
 package dev.alexcoss.dao;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,16 +13,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
-public class StudentsCoursesDao extends AbstractDao<Map<Integer, Integer>, Map<Integer, Set<Integer>>> {
+@Slf4j
+@RequiredArgsConstructor
+public class StudentsCoursesDao implements Dao<Map<Integer, Integer>, Map<Integer, Set<Integer>>> {
 
     private static final String INSERT_SQL = "INSERT INTO students_courses (student_id, course_id) VALUES (?, ?)";
     private static final String DELETE_SQL = "DELETE FROM students_courses WHERE student_id = ? AND course_id = ?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM students_courses";
     private static final String NUMBER_OF_EXISTING_SQL = "SELECT COUNT(*) FROM students_courses WHERE student_id = ? AND course_id = ?";
 
-    public StudentsCoursesDao(JdbcTemplate jdbcTemplate) {
-        super(StudentsCoursesDao.class.getName(), jdbcTemplate);
-    }
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public void addAllItems(Map<Integer, Set<Integer>> map) {
@@ -31,15 +33,16 @@ public class StudentsCoursesDao extends AbstractDao<Map<Integer, Integer>, Map<I
                 if (!exists(studentId, courseId)) {
                     batchArgs.add(new Object[]{studentId, courseId});
                 } else {
-                    logger.warning("Skipping duplicate entry: " + studentId + ", " + courseId);
+                    log.warn("Skipping duplicate entry: " + studentId + ", " + courseId);
                 }
             }
         });
 
         try {
             jdbcTemplate.batchUpdate(INSERT_SQL, batchArgs);
+            log.info("Adding related table to database {}", map);
         } catch (DataAccessException e) {
-            handleSQLException(e, "Error adding related table to database", INSERT_SQL, map);
+            log.error("Error adding related table to database. \nSQL: {} \nParameters: {}", INSERT_SQL, map, e);
         }
     }
 
@@ -55,7 +58,7 @@ public class StudentsCoursesDao extends AbstractDao<Map<Integer, Integer>, Map<I
     @Override
     public Map<Integer, Set<Integer>> getAllItems() {
         try {
-            return jdbcTemplate.query(SELECT_ALL_SQL, (resultSet, rowNum) -> {
+            Map<Integer, Set<Integer>> map = jdbcTemplate.query(SELECT_ALL_SQL, (resultSet, rowNum) -> {
                     int studentId = resultSet.getInt("student_id");
                     int courseId = resultSet.getInt("course_id");
 
@@ -63,15 +66,11 @@ public class StudentsCoursesDao extends AbstractDao<Map<Integer, Integer>, Map<I
                 }).stream()
                 .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toSet())));
 
+            log.info("Getting items from database: {}", map);
+            return map;
         } catch (DataAccessException e) {
-            handleSQLException(e, "Error getting items from database", SELECT_ALL_SQL);
+            log.error("Error getting items from database. \nSQL: {}", SELECT_ALL_SQL, e);
             return Collections.emptyMap();
-        }
-    }
-
-    private void setValuesToStatement(PreparedStatement preparedStatement, int... values) throws SQLException {
-        for (int i = 0; i < values.length; i++) {
-            preparedStatement.setInt(i + 1, values[i]);
         }
     }
 
@@ -90,7 +89,13 @@ public class StudentsCoursesDao extends AbstractDao<Map<Integer, Integer>, Map<I
                 }
             });
         } catch (DataAccessException e) {
-            handleSQLException(e, errorMessage, sql, map);
+            log.error(errorMessage + "\nSQL: {} \nParameters: {}", sql, map, e);
+        }
+    }
+
+    private void setValuesToStatement(PreparedStatement preparedStatement, int... values) throws SQLException {
+        for (int i = 0; i < values.length; i++) {
+            preparedStatement.setInt(i + 1, values[i]);
         }
     }
 

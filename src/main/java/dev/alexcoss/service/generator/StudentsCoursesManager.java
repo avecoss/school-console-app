@@ -6,7 +6,8 @@ import dev.alexcoss.service.CourseService;
 import dev.alexcoss.service.StudentCourseService;
 import dev.alexcoss.service.StudentService;
 import dev.alexcoss.service.generator.rangomizer.CourseRandomizer;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,24 +15,24 @@ import java.util.Map;
 import java.util.Set;
 
 @Component
+@Slf4j
+@RequiredArgsConstructor
 public class StudentsCoursesManager {
     private final CourseRandomizer courseRandomizer;
     private final StudentCourseService studentCourseService;
     private final StudentService studentService;
     private final CourseService courseService;
 
-    public StudentsCoursesManager(CourseRandomizer courseRandomizer, StudentCourseService studentCourseService,
-                                  StudentService studentService, CourseService courseService) {
-        this.courseRandomizer = courseRandomizer;
-        this.studentCourseService = studentCourseService;
-        this.studentService = studentService;
-        this.courseService = courseService;
-    }
-
     public void assignStudentsToCoursesAndSave() {
         List<StudentDTO> studentsFromDatabase = studentService.getStudents();
         List<CourseDTO> coursesFromDatabase = courseService.getCourses();
         Map<Integer, Set<Integer>> mapStudentCourses = courseRandomizer.assignStudentsToCourse(studentsFromDatabase, coursesFromDatabase);
-        studentCourseService.addAllStudentCourseRelationships(mapStudentCourses);
+
+        if (!mapStudentCourses.isEmpty()) {
+            studentCourseService.addAllStudentCourseRelationships(mapStudentCourses);
+            log.info("Students assigned to courses and relationships saved");
+        } else {
+            log.warn("No students assigned to courses");
+        }
     }
 }

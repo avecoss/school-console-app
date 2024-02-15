@@ -5,6 +5,7 @@ import dev.alexcoss.service.CourseService;
 import dev.alexcoss.service.GroupService;
 import dev.alexcoss.service.StudentCourseService;
 import dev.alexcoss.service.StudentService;
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -16,9 +17,13 @@ import java.util.Scanner;
 public class CommandInputScanner {
     private static final String EXIT_COMMAND = "exit";
 
+    @Getter
     private final StudentService studentService;
+    @Getter
     private final GroupService groupService;
+    @Getter
     private final CourseService courseService;
+    @Getter
     private final StudentCourseService studentCourseService;
     private final Map<Integer, Action> actions = new HashMap<>();
 
@@ -52,22 +57,6 @@ public class CommandInputScanner {
                 }
             }
         }
-    }
-
-    public StudentService getStudentService() {
-        return studentService;
-    }
-
-    public GroupService getGroupService() {
-        return groupService;
-    }
-
-    public CourseService getCourseService() {
-        return courseService;
-    }
-
-    public StudentCourseService getStudentCourseService() {
-        return studentCourseService;
     }
 
     private void processIntegerInput(int commandsCount, int number) {
