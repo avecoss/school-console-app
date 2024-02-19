@@ -1,24 +1,11 @@
 package dev.alexcoss.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Setter
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class GroupDTO {
     private int id;
     private String name;
-
-    public GroupDTO(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return name;
-    }
 }
