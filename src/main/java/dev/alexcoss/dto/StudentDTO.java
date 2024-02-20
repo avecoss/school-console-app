@@ -1,7 +1,16 @@
 package dev.alexcoss.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.Objects;
 
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class StudentDTO {
     private final Integer defaultInteger = -1;
 
@@ -10,47 +19,10 @@ public class StudentDTO {
     private String lastName;
     private Integer groupId = defaultInteger;
 
-    public StudentDTO() {
-    }
 
     public StudentDTO(int id, String firstName, String lastName) {
         this.id = id;
         this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
-    public StudentDTO(int id, String firstName, String lastName, Integer groupId) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.groupId = groupId;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public Integer getGroupId() {
-        return groupId;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 

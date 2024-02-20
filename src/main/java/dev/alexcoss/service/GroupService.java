@@ -3,6 +3,8 @@ package dev.alexcoss.service;
 import dev.alexcoss.dao.GroupDao;
 import dev.alexcoss.dto.GroupDTO;
 import dev.alexcoss.model.Group;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,32 +14,36 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class GroupService extends AbstractService {
+@Slf4j
+@RequiredArgsConstructor
+public class GroupService{
 
-    private GroupDao groupRepository;
-    private ModelMapper modelMapper;
-
-    public GroupService(GroupDao groupRepository, ModelMapper modelMapper) {
-        super(GroupService.class.getName());
-        this.groupRepository = groupRepository;
-        this.modelMapper = modelMapper;
-    }
+    private final GroupDao groupRepository;
+    private final ModelMapper modelMapper;
 
     public List<GroupDTO> getGroups() {
+        log.info("Getting all groups from the database");
         List<Group> groups = groupRepository.getAllItems();
-        return groups.stream()
+
+        List<GroupDTO> groupDTOList = groups.stream()
             .map(group -> modelMapper.map(group, GroupDTO.class))
             .toList();
+
+        log.info("Retrieved {} groups from the database", groupDTOList.size());
+        return groupDTOList;
     }
 
     public Map<GroupDTO, Integer> getAllGroupsWithStudents() {
-        return groupRepository.getAllGroupsWithStudents()
+        Map<GroupDTO, Integer> groupsWithStudents = groupRepository.getAllGroupsWithStudents()
             .entrySet()
             .stream()
             .collect(Collectors.toMap(
                 entry -> modelMapper.map(entry.getKey(), GroupDTO.class),
                 Map.Entry::getValue
             ));
+
+        log.info("Retrieved all groups with students from the database");
+        return groupsWithStudents;
     }
 
     public void addGroups(List<GroupDTO> groupList) {
@@ -47,18 +53,19 @@ public class GroupService extends AbstractService {
                 .toList();
 
             groupRepository.addAllItems(groups);
+            log.info("Added {} groups to the database", groups.size());
         }
     }
 
     private boolean isValidGroupList(List<GroupDTO> groupList) {
         if (groupList == null || groupList.isEmpty()) {
-            handleServiceException("Group list is null or empty");
+            log.error("Group list is null or empty");
             return false;
         }
 
         for (GroupDTO group : groupList) {
             if (group == null) {
-                handleServiceException("Invalid group in the list");
+                log.error("Invalid group in the list");
                 return false;
             }
         }

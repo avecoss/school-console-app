@@ -1,26 +1,17 @@
 package dev.alexcoss.service.generator;
 
-import dev.alexcoss.dao.EmptyTableChecker;
 import dev.alexcoss.dao.TableValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class GenerateStartingData {
     private final GroupManager groupManager;
     private final CourseManager courseManager;
     private final StudentManager studentManager;
     private final StudentsCoursesManager studentsCoursesManager;
     private final TableValidator tableValidator;
-
-    public GenerateStartingData(GroupManager groupManager, CourseManager courseManager, StudentManager studentManager,
-                                StudentsCoursesManager studentsCoursesManager, EmptyTableChecker tableValidator) {
-        this.groupManager = groupManager;
-        this.courseManager = courseManager;
-        this.studentManager = studentManager;
-        this.studentsCoursesManager = studentsCoursesManager;
-        this.tableValidator = tableValidator;
-    }
 
     public void generateDataForDatabase() {
         generateDataIfTableIsEmpty("groups", groupManager::generateAndSaveGroupsToDatabase);

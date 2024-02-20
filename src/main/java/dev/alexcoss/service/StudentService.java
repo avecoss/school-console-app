@@ -3,8 +3,9 @@ package dev.alexcoss.service;
 import dev.alexcoss.dao.StudentDao;
 import dev.alexcoss.dto.StudentDTO;
 import dev.alexcoss.model.Student;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,30 +13,35 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
-public class StudentService extends AbstractService {
+@Slf4j
+@RequiredArgsConstructor
+public class StudentService {
 
-    private StudentDao studentRepository;
-    private ModelMapper modelMapper;
-
-    public StudentService(StudentDao studentRepository, ModelMapper modelMapper) {
-        super(StudentService.class.getName());
-        this.studentRepository = studentRepository;
-        this.modelMapper = modelMapper;
-    }
+    private final StudentDao studentRepository;
+    private final ModelMapper modelMapper;
 
     public Optional<StudentDTO> getStudentById(int id) {
         return studentRepository.getStudentById(id)
-            .map(student -> modelMapper.map(student, StudentDTO.class));
+            .map(student -> {
+                log.info("Found student with ID {}: {}", id, student);
+                return modelMapper.map(student, StudentDTO.class);
+            });
     }
 
     public List<StudentDTO> getStudentsByCourse(String courseName) {
         List<Student> students = studentRepository.getStudentsByCourse(courseName);
-        return getStudentDTOList(students);
+        List<StudentDTO> studentDTOList = getStudentDTOList(students);
+        log.info("Found {} students for course: {}", studentDTOList.size(), courseName);
+
+        return studentDTOList;
     }
 
     public List<StudentDTO> getStudents() {
         List<Student> students = studentRepository.getAllItems();
-        return getStudentDTOList(students);
+        List<StudentDTO> studentDTOList = getStudentDTOList(students);
+        log.info("Found {} students", studentDTOList.size());
+
+        return studentDTOList;
     }
 
     public void addStudents(List<StudentDTO> studentList) {
@@ -45,14 +51,16 @@ public class StudentService extends AbstractService {
                 .toList();
 
             studentRepository.addAllItems(students);
+            log.info("Added {} students to the repository", studentList.size());
         }
     }
 
     public void addStudent(StudentDTO student) {
         if (isValidStudent(student)) {
             studentRepository.addItem(modelMapper.map(student, Student.class));
+            log.info("Added student to the repository: {}", student);
         } else {
-            handleServiceException("Invalid student data: First name or last name is empty");
+            log.error("Invalid student data: First name or last name is empty");
         }
     }
 
@@ -61,6 +69,7 @@ public class StudentService extends AbstractService {
 
         if (existingStudent.isPresent()) {
             studentRepository.removeStudentById(studentId);
+            log.info("Removed student with ID {}", studentId);
         } else {
             throw new NoSuchElementException("Student with ID " + studentId + " not found");
         }
@@ -78,13 +87,13 @@ public class StudentService extends AbstractService {
 
     private boolean isValidStudentList(List<StudentDTO> studentList) {
         if (studentList == null || studentList.isEmpty()) {
-            handleServiceException("Student list is null or empty");
+            log.error("Student list is null or empty");
             return false;
         }
 
         for (StudentDTO student : studentList) {
             if (!isValidStudent(student)) {
-                handleServiceException("Invalid student in the list");
+                log.error("Invalid student in the list");
                 return false;
             }
         }

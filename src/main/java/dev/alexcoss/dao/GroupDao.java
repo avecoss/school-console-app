@@ -2,6 +2,8 @@ package dev.alexcoss.dao;
 
 import dev.alexcoss.mapper.GroupRowMapper;
 import dev.alexcoss.model.Group;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,7 +18,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
-public class GroupDao extends AbstractDao<Group, List<Group>> {
+@Slf4j
+@RequiredArgsConstructor
+public class GroupDao implements Dao<Group, List<Group>> {
 
     private static final String INSERT_SQL = "INSERT INTO groups (group_name) VALUES (?)";
     private static final String SELECT_ALL_SQL = "SELECT * FROM groups";
@@ -26,16 +30,15 @@ public class GroupDao extends AbstractDao<Group, List<Group>> {
         "      GROUP BY s.group_id, g.group_name\n" +
         "      ORDER BY num_students;";
 
-    public GroupDao(JdbcTemplate jdbcTemplate) {
-        super(GroupDao.class.getName(), jdbcTemplate);
-    }
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public void addItem(Group group) {
         try {
             jdbcTemplate.update(INSERT_SQL, group.getName());
+            log.info("Adding group to database: {}", group);
         } catch (DataAccessException e) {
-            handleSQLException(e, "Error adding group to database", INSERT_SQL, group);
+            log.error("Error adding group to database \nSQL: {} \nParameters: {}", INSERT_SQL, group, e);
         }
     }
 
@@ -54,24 +57,27 @@ public class GroupDao extends AbstractDao<Group, List<Group>> {
                     return groupList.size();
                 }
             });
+            log.info("Adding groups to database: {}", groupList);
         } catch (DataAccessException e) {
-            handleSQLException(e, "Error adding groups to database", INSERT_SQL, groupList);
+            log.error("Error adding groups to database \nSQL: {} \nParameters: {}", INSERT_SQL, groupList, e);
         }
     }
 
     @Override
     public List<Group> getAllItems() {
         try {
-            return jdbcTemplate.query(SELECT_ALL_SQL, new GroupRowMapper());
+            List<Group> groups = jdbcTemplate.query(SELECT_ALL_SQL, new GroupRowMapper());
+            log.info("Getting groups from database: {}", groups);
+            return groups;
         } catch (DataAccessException e) {
-            handleSQLException(e, "Error getting groups from database", SELECT_ALL_SQL);
+            log.error("Error getting groups from database. \nSQL: {}", SELECT_ALL_SQL, e);
             return Collections.emptyList();
         }
     }
 
     public Map<Group, Integer> getAllGroupsWithStudents() {
         try {
-            return jdbcTemplate.query(SELECT_ALL_WITH_STUDENTS, (resultSet, rowNum) -> {
+            Map<Group, Integer> groupsWithStudents = jdbcTemplate.query(SELECT_ALL_WITH_STUDENTS, (resultSet, rowNum) -> {
                     Group group = new Group();
                     group.setId(resultSet.getInt("group_id"));
                     group.setName(resultSet.getString("group_name"));
@@ -82,8 +88,10 @@ public class GroupDao extends AbstractDao<Group, List<Group>> {
                 }).stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
+            log.info("Getting all groups with students from database: {}", groupsWithStudents);
+            return groupsWithStudents;
         } catch (DataAccessException e) {
-            handleSQLException(e, "Error getting all groups with students from database", SELECT_ALL_WITH_STUDENTS);
+            log.error("Error getting all groups with students from database. \nSQL: {}", SELECT_ALL_SQL, e);
             return Collections.emptyMap();
         }
     }
