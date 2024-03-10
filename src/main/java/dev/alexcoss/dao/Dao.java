@@ -2,9 +2,9 @@ package dev.alexcoss.dao;
 
 public interface Dao<T, E> {
 
-    void addItem(T item);
+    void saveItem(T item);
 
-    E getAllItems();
+    E findAllItems();
 
-    void addAllItems(E items);
+    void saveAllItems(E items);
 }

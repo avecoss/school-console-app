@@ -1,6 +1,6 @@
 package dev.alexcoss.service;
 
-import dev.alexcoss.dao.CourseDao;
+import dev.alexcoss.dao.JPACourseDao;
 import dev.alexcoss.dto.CourseDTO;
 import dev.alexcoss.model.Course;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +15,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CourseService {
 
-    private final CourseDao courseRepository;
+    private final JPACourseDao courseRepository;
     private final ModelMapper modelMapper;
 
     public List<CourseDTO> getCourses() {
-        List<Course> courses = courseRepository.getAllItems();
+        List<Course> courses = courseRepository.findAllItems();
         log.info("Getting all courses from the database");
 
         List<CourseDTO> courseDTOList = courses.stream()
@@ -36,7 +36,7 @@ public class CourseService {
                 .map(courseDTO -> modelMapper.map(courseDTO, Course.class))
                 .toList();
 
-            courseRepository.addAllItems(courses);
+            courseRepository.saveAllItems(courses);
             log.info("Added {} courses to the database", courses.size());
         }
     }

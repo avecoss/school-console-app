@@ -1,14 +1,16 @@
 package dev.alexcoss.service;
 
-import dev.alexcoss.dao.StudentsCoursesDao;
+import dev.alexcoss.dao.JPACourseDao;
+import dev.alexcoss.dao.JPAStudentDao;
+import dev.alexcoss.model.Course;
+import dev.alexcoss.model.Student;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -16,28 +18,49 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class StudentCourseService {
 
-    private final StudentsCoursesDao studentsCoursesRepository;
+    private final JPACourseDao courseDao;
+    private final JPAStudentDao studentDao;
 
+    @Transactional
     public void addAllStudentCourseRelationships(Map<Integer, Set<Integer>> studentCourseMap) {
         if (isValidStudentCourseMap(studentCourseMap)) {
-            studentsCoursesRepository.addAllItems(studentCourseMap);
+            studentCourseMap.forEach((studentId, courseIds) -> {
+                studentDao.findItemById(studentId).ifPresent(student -> {
+                    courseIds.stream()
+                        .map(courseDao::findItemById)
+                        .flatMap(Optional::stream)
+                        .forEach(course -> {
+                            course.addStudentToCourse(student);
+                        });
+                });
+            });
             log.info("Added all student-course relationships to the database");
         }
     }
 
+    @Transactional
     public void addStudentToCourse(int studentId, int courseId) {
         if (isValidId(studentId, "Student ID") && isValidId(courseId, "Course ID")) {
-            Map<Integer, Integer> map = Collections.singletonMap(studentId, courseId);
-            studentsCoursesRepository.addItem(map);
-            log.info("Added student with ID {} to the course with ID {}", studentId, courseId);
+            Optional<Student> studentById = studentDao.findItemById(studentId);
+            Optional<Course> courseById = courseDao.findItemById(courseId);
+
+            if (studentById.isPresent() && courseById.isPresent()) {
+                courseById.get().addStudentToCourse(studentById.get());
+                log.info("Added student with ID {} to the course with ID {}", studentId, courseId);
+            }
         }
     }
 
+    @Transactional
     public void removeStudentFromCourse(int studentId, int courseId) {
         if (isValidId(studentId, "Student ID") && isValidId(courseId, "Course ID")) {
-            Map<Integer, Integer> map = Collections.singletonMap(studentId, courseId);
-            studentsCoursesRepository.removeItems(map);
-            log.info("Removed student with ID {} from the course with ID {}", studentId, courseId);
+            Optional<Student> studentById = studentDao.findItemById(studentId);
+            Optional<Course> courseById = courseDao.findItemById(courseId);
+
+            if (studentById.isPresent() && courseById.isPresent()) {
+                courseById.get().removeStudentFromCourse(studentById.get());
+                log.info("Removed student with ID {} from the course with ID {}", studentId, courseId);
+            }
         }
     }
 

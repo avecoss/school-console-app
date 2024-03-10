@@ -25,14 +25,14 @@ public class GroupRandomizer extends Randomizer {
     private void distributeStudentsToGroups(List<StudentDTO> students, List<GroupDTO> groups, List<StudentDTO> studentsInGroups) {
         for (GroupDTO group : groups) {
             int groupSize = getRandomInteger(MAX_STUDENTS_IN_GROUP, MIN_STUDENTS_IN_GROUP);
-            addStudentsToGroup(students, studentsInGroups, groupSize, group.getId());
+            addStudentsToGroup(students, studentsInGroups, groupSize, group);
         }
     }
 
-    private void addStudentsToGroup(List<StudentDTO> students, List<StudentDTO> studentsInGroups, int groupSize, int groupId) {
+    private void addStudentsToGroup(List<StudentDTO> students, List<StudentDTO> studentsInGroups, int groupSize, GroupDTO groupDTO) {
         for (int i = 0; i < groupSize && !students.isEmpty(); i++) {
             StudentDTO student = students.remove(0);
-            student.setGroupId(groupId);
+            student.setGroup(groupDTO);
             studentsInGroups.add(student);
         }
     }

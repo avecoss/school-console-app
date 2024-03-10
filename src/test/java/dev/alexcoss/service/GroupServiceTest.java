@@ -1,6 +1,6 @@
 package dev.alexcoss.service;
 
-import dev.alexcoss.dao.GroupDao;
+import dev.alexcoss.dao.JPAGroupDao;
 import dev.alexcoss.dto.GroupDTO;
 import dev.alexcoss.model.Group;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = {GroupService.class, ModelMapper.class})
 class GroupServiceTest {
     @MockBean
-    private GroupDao groupDao;
+    private JPAGroupDao groupDao;
 
     @Autowired
     private GroupService groupService;
@@ -25,26 +25,26 @@ class GroupServiceTest {
     @Test
     public void shouldGetAllGroups() {
         List<Group> groupEntityList = getSampleGroupEntityList();
-        when(groupDao.getAllItems()).thenReturn(groupEntityList);
+        when(groupDao.findAllItems()).thenReturn(groupEntityList);
 
         List<GroupDTO> expectedGroup = getSampleGroupDtoList();
         List<GroupDTO> actualGroups = groupService.getGroups();
 
         assertEquals(expectedGroup.size(), actualGroups.size());
         assertEquals(expectedGroup.get(0).getName(), actualGroups.get(0).getName());
-        verify(groupDao).getAllItems();
+        verify(groupDao).findAllItems();
     }
 
     @Test
     public void shouldGetAllGroupsWithStudents() {
         Map<Group, Integer> groupsWithStudents = getSampleGroupsWithStudents();
-        when(groupDao.getAllGroupsWithStudents()).thenReturn(groupsWithStudents);
+        when(groupDao.findAllGroupsWithStudents()).thenReturn(groupsWithStudents);
 
         Map<GroupDTO, Integer> expectedGroupsDtoWithStudents = getSampleGroupsDtoWithStudents();
         Map<GroupDTO, Integer> actualGroupsWithStudents = groupService.getAllGroupsWithStudents();
 
         assertEquals(expectedGroupsDtoWithStudents.size(), actualGroupsWithStudents.size());
-        verify(groupDao).getAllGroupsWithStudents();
+        verify(groupDao).findAllGroupsWithStudents();
     }
 
     @Test
@@ -52,21 +52,21 @@ class GroupServiceTest {
         List<GroupDTO> groupDtoList = getSampleGroupDtoList();
         groupService.addGroups(groupDtoList);
 
-        verify(groupDao, times(1)).addAllItems(getSampleGroupEntityList());
+        verify(groupDao, times(1)).saveAllItems(getSampleGroupEntityList());
     }
 
     @Test
     public void shouldNotAddGroupsWhenListIsNull() {
         groupService.addGroups(null);
 
-        verify(groupDao, never()).addAllItems(anyList());
+        verify(groupDao, never()).saveAllItems(anyList());
     }
 
     @Test
     public void shouldNotAddGroupsWhenListIsEmpty() {
         groupService.addGroups(Collections.emptyList());
 
-        verify(groupDao, never()).addAllItems(anyList());
+        verify(groupDao, never()).saveAllItems(anyList());
     }
 
     @Test
@@ -74,7 +74,7 @@ class GroupServiceTest {
         List<GroupDTO> groupListWithNull = Arrays.asList(new GroupDTO(), null);
         groupService.addGroups(groupListWithNull);
 
-        verify(groupDao, never()).addAllItems(anyList());
+        verify(groupDao, never()).saveAllItems(anyList());
     }
 
     private Group getGroup(int id, String name) {

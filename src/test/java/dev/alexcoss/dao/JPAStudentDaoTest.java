@@ -6,10 +6,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.ArrayList;
@@ -20,28 +21,27 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
 @ActiveProfiles("test")
-@JdbcTest
+@DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {JPAStudentDao.class}))
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class StudentDaoTest {
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+class JPAStudentDaoTest {
+
     @Autowired
     private Flyway flyway;
-    private StudentDao studentDao;
+    @Autowired
+    private JPAStudentDao studentDao;
 
     @BeforeEach
     void setUp() {
         flyway.clean();
-        studentDao = new StudentDao(jdbcTemplate);
         flyway.migrate();
     }
 
     @Test
     void shouldAddItem() {
-        Student student = getTestStudent();
-        studentDao.addItem(student);
+        Student student = Student.builder().firstName("John").lastName("Doe").build();
+        studentDao.saveItem(student);
 
-        Optional<Student> retrievedStudent = studentDao.getStudentById(1);
+        Optional<Student> retrievedStudent = studentDao.findItemById(1);
 
         assertTrue(retrievedStudent.isPresent());
         assertEquals(student, retrievedStudent.get());
@@ -49,10 +49,10 @@ class StudentDaoTest {
 
     @Test
     void shouldGetStudentById() {
-        Student student = getTestStudent();
-        studentDao.addItem(student);
+        Student student = Student.builder().firstName("John").lastName("Doe").build();
+        studentDao.saveItem(student);
 
-        Optional<Student> retrievedStudent = studentDao.getStudentById(1);
+        Optional<Student> retrievedStudent = studentDao.findItemById(1);
 
         assertTrue(retrievedStudent.isPresent());
         assertEquals(student, retrievedStudent.get());
@@ -60,13 +60,13 @@ class StudentDaoTest {
 
     @Test
     void shouldUpdateStudent() {
-        Student student = getTestStudent();
-        studentDao.addItem(student);
+        Student student = Student.builder().firstName("John").lastName("Doe").build();
+        studentDao.saveItem(student);
 
         student.setFirstName("firstName");
-        studentDao.updateStudent(student);
+        studentDao.updateItem(student);
 
-        Optional<Student> updatedStudent = studentDao.getStudentById(1);
+        Optional<Student> updatedStudent = studentDao.findItemById(1);
 
         assertTrue(updatedStudent.isPresent());
         assertEquals(student, updatedStudent.get());
@@ -74,10 +74,12 @@ class StudentDaoTest {
 
     @Test
     void shouldRemoveStudentById() {
-        Student student = getTestStudent();
-        studentDao.addItem(student);
+        Student student = Student.builder().firstName("John").lastName("Doe").build();
+        studentDao.saveItem(student);
 
-        Optional<Student> removedStudent = studentDao.getStudentById(1);
+        studentDao.deleteItemById(1);
+
+        Optional<Student> removedStudent = studentDao.findItemById(1);
 
         assertFalse(removedStudent.isPresent());
     }
@@ -85,33 +87,15 @@ class StudentDaoTest {
     @Test
     void shouldGetAndAddAllItems() {
         List<Student> students = new ArrayList<>();
-        students.add(getTestStudent(1, "John"));
-        students.add(getTestStudent(2, "Jane"));
-        students.add(getTestStudent(3, "Jim"));
+        students.add(Student.builder().firstName("John").lastName("Doe").build());
+        students.add(Student.builder().firstName("Jane").lastName("Doe").build());
+        students.add(Student.builder().firstName("Jim").lastName("Doe").build());
 
-        studentDao.addAllItems(students);
+        studentDao.saveAllItems(students);
 
-        List<Student> retrievedStudents = studentDao.getAllItems();
+        List<Student> retrievedStudents = studentDao.findAllItems();
 
         assertEquals(students.size(), retrievedStudents.size());
         assertEquals(students, retrievedStudents);
-    }
-
-    private Student getTestStudent() {
-        Student student = new Student();
-        student.setId(1);
-        student.setFirstName("John");
-        student.setLastName("Doe");
-
-        return student;
-    }
-
-    private Student getTestStudent(int id, String name) {
-        Student student = new Student();
-        student.setId(id);
-        student.setFirstName(name);
-        student.setLastName("Doe");
-
-        return student;
     }
 }

@@ -1,20 +1,37 @@
 package dev.alexcoss.model;
 
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(exclude = "courses")
+@ToString(exclude = "courses")
+@Builder
+@Entity
+@Table(name = "students")
 public class Student {
+
+    @Id
+    @Column(name = "student_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(name = "first_name")
     private String firstName;
+
+    @Column(name = "last_name")
     private String lastName;
-    private Integer groupId;
 
-    public void setGroupId(Integer groupId) {
-        this.groupId = (groupId != null && groupId != -1) ? groupId : null;
-    }
+    @ManyToOne
+    @JoinColumn(name = "group_id")
+    private Group group;
 
-    @Override
-    public String toString() {
-        return String.format("\n%d %s %s groupId:%d", id, firstName, lastName, groupId);
-    }
+    @Builder.Default
+    @ManyToMany(mappedBy = "students")
+    private Set<Course> courses = new HashSet<>();
 }

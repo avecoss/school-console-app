@@ -1,6 +1,6 @@
 package dev.alexcoss.service;
 
-import dev.alexcoss.dao.StudentDao;
+import dev.alexcoss.dao.JPAStudentDao;
 import dev.alexcoss.dto.StudentDTO;
 import dev.alexcoss.model.Student;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +17,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class StudentService {
 
-    private final StudentDao studentRepository;
+    private final JPAStudentDao studentRepository;
     private final ModelMapper modelMapper;
 
     public Optional<StudentDTO> getStudentById(int id) {
-        return studentRepository.getStudentById(id)
+        return studentRepository.findItemById(id)
             .map(student -> {
                 log.info("Found student with ID {}: {}", id, student);
                 return modelMapper.map(student, StudentDTO.class);
@@ -29,7 +29,7 @@ public class StudentService {
     }
 
     public List<StudentDTO> getStudentsByCourse(String courseName) {
-        List<Student> students = studentRepository.getStudentsByCourse(courseName);
+        List<Student> students = studentRepository.findStudentsByCourse(courseName);
         List<StudentDTO> studentDTOList = getStudentDTOList(students);
         log.info("Found {} students for course: {}", studentDTOList.size(), courseName);
 
@@ -37,7 +37,7 @@ public class StudentService {
     }
 
     public List<StudentDTO> getStudents() {
-        List<Student> students = studentRepository.getAllItems();
+        List<Student> students = studentRepository.findAllItems();
         List<StudentDTO> studentDTOList = getStudentDTOList(students);
         log.info("Found {} students", studentDTOList.size());
 
@@ -50,14 +50,14 @@ public class StudentService {
                 .map(studentDTO -> modelMapper.map(studentDTO, Student.class))
                 .toList();
 
-            studentRepository.addAllItems(students);
+            studentRepository.saveAllItems(students);
             log.info("Added {} students to the repository", studentList.size());
         }
     }
 
     public void addStudent(StudentDTO student) {
         if (isValidStudent(student)) {
-            studentRepository.addItem(modelMapper.map(student, Student.class));
+            studentRepository.saveItem(modelMapper.map(student, Student.class));
             log.info("Added student to the repository: {}", student);
         } else {
             log.error("Invalid student data: First name or last name is empty");
@@ -68,7 +68,7 @@ public class StudentService {
         Optional<StudentDTO> existingStudent = getStudentById(studentId);
 
         if (existingStudent.isPresent()) {
-            studentRepository.removeStudentById(studentId);
+            studentRepository.deleteItemById(studentId);
             log.info("Removed student with ID {}", studentId);
         } else {
             throw new NoSuchElementException("Student with ID " + studentId + " not found");

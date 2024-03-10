@@ -1,31 +1,48 @@
 package dev.alexcoss.model;
 
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
 
-import java.util.Objects;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(exclude = {"description", "students"})
+@ToString(exclude = "students")
+@Builder
+@Entity
+@Table(name = "courses")
 public class Course {
 
+    @Id
+    @Column(name = "course_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(name = "course_name")
     private String name;
+
+    @Column(name = "course_description")
     private String description;
 
-    @Override
-    public String toString() {
-        return String.format("\n%d %s Description: %s", id, name, description);
+    @Builder.Default
+    @ManyToMany
+    @JoinTable(
+        name = "students_courses",
+        joinColumns = @JoinColumn(name = "course_id"),
+        inverseJoinColumns = @JoinColumn(name = "student_id")
+    )
+    private Set<Student> students = new HashSet<>();
+
+    public void addStudentToCourse(Student student) {
+        students.add(student);
+        student.getCourses().add(this);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Course course = (Course) o;
-        return id == course.id && Objects.equals(name, course.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
+    public void removeStudentFromCourse(Student student) {
+        students.remove(student);
+        student.getCourses().remove(this);
     }
 }

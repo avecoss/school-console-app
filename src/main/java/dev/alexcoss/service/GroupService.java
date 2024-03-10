@@ -1,12 +1,11 @@
 package dev.alexcoss.service;
 
-import dev.alexcoss.dao.GroupDao;
+import dev.alexcoss.dao.JPAGroupDao;
 import dev.alexcoss.dto.GroupDTO;
 import dev.alexcoss.model.Group;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,12 +17,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GroupService{
 
-    private final GroupDao groupRepository;
+    private final JPAGroupDao groupRepository;
     private final ModelMapper modelMapper;
 
     public List<GroupDTO> getGroups() {
         log.info("Getting all groups from the database");
-        List<Group> groups = groupRepository.getAllItems();
+        List<Group> groups = groupRepository.findAllItems();
 
         List<GroupDTO> groupDTOList = groups.stream()
             .map(group -> modelMapper.map(group, GroupDTO.class))
@@ -34,7 +33,7 @@ public class GroupService{
     }
 
     public Map<GroupDTO, Integer> getAllGroupsWithStudents() {
-        Map<GroupDTO, Integer> groupsWithStudents = groupRepository.getAllGroupsWithStudents()
+        Map<GroupDTO, Integer> groupsWithStudents = groupRepository.findAllGroupsWithStudents()
             .entrySet()
             .stream()
             .collect(Collectors.toMap(
@@ -52,7 +51,7 @@ public class GroupService{
                 .map(groupDTO -> modelMapper.map(groupDTO, Group.class))
                 .toList();
 
-            groupRepository.addAllItems(groups);
+            groupRepository.saveAllItems(groups);
             log.info("Added {} groups to the database", groups.size());
         }
     }
