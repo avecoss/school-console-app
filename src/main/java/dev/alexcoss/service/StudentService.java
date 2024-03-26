@@ -3,10 +3,12 @@ package dev.alexcoss.service;
 import dev.alexcoss.dao.JPAStudentDao;
 import dev.alexcoss.dto.StudentDTO;
 import dev.alexcoss.model.Student;
+import dev.alexcoss.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -17,11 +19,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class StudentService {
 
-    private final JPAStudentDao studentRepository;
+    private final JPAStudentDao jpaStudentDao;
+    private final StudentRepository studentRepository;
     private final ModelMapper modelMapper;
 
     public Optional<StudentDTO> getStudentById(int id) {
-        return studentRepository.findItemById(id)
+        return jpaStudentDao.findItemById(id)
             .map(student -> {
                 log.info("Found student with ID {}: {}", id, student);
                 return modelMapper.map(student, StudentDTO.class);
@@ -29,7 +32,7 @@ public class StudentService {
     }
 
     public List<StudentDTO> getStudentsByCourse(String courseName) {
-        List<Student> students = studentRepository.findStudentsByCourse(courseName);
+        List<Student> students = jpaStudentDao.findStudentsByCourse(courseName);
         List<StudentDTO> studentDTOList = getStudentDTOList(students);
         log.info("Found {} students for course: {}", studentDTOList.size(), courseName);
 
@@ -37,27 +40,28 @@ public class StudentService {
     }
 
     public List<StudentDTO> getStudents() {
-        List<Student> students = studentRepository.findAllItems();
+        List<Student> students = jpaStudentDao.findAllItems();
         List<StudentDTO> studentDTOList = getStudentDTOList(students);
         log.info("Found {} students", studentDTOList.size());
 
         return studentDTOList;
     }
 
+    @Transactional
     public void addStudents(List<StudentDTO> studentList) {
         if (isValidStudentList(studentList)) {
             List<Student> students = studentList.stream()
                 .map(studentDTO -> modelMapper.map(studentDTO, Student.class))
                 .toList();
 
-            studentRepository.saveAllItems(students);
+            studentRepository.saveAllAndFlush(students);
             log.info("Added {} students to the repository", studentList.size());
         }
     }
 
     public void addStudent(StudentDTO student) {
         if (isValidStudent(student)) {
-            studentRepository.saveItem(modelMapper.map(student, Student.class));
+            jpaStudentDao.saveItem(modelMapper.map(student, Student.class));
             log.info("Added student to the repository: {}", student);
         } else {
             log.error("Invalid student data: First name or last name is empty");
@@ -68,7 +72,7 @@ public class StudentService {
         Optional<StudentDTO> existingStudent = getStudentById(studentId);
 
         if (existingStudent.isPresent()) {
-            studentRepository.deleteItemById(studentId);
+            jpaStudentDao.deleteItemById(studentId);
             log.info("Removed student with ID {}", studentId);
         } else {
             throw new NoSuchElementException("Student with ID " + studentId + " not found");

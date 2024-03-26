@@ -3,6 +3,7 @@ package dev.alexcoss.service;
 import dev.alexcoss.dao.JPAStudentDao;
 import dev.alexcoss.dto.StudentDTO;
 import dev.alexcoss.model.Student;
+import dev.alexcoss.repository.StudentRepository;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import static org.mockito.Mockito.*;
 class StudentServiceTest {
     @MockBean
     private JPAStudentDao studentDao;
+    @MockBean
+    private StudentRepository studentRepository;
 
     @Autowired
     private StudentService studentService;
@@ -59,21 +62,21 @@ class StudentServiceTest {
         List<StudentDTO> studentList = getSampleStudentDtoList();
         studentService.addStudents(studentList);
 
-        verify(studentDao, times(1)).saveAllItems(anyList());
+        verify(studentRepository, times(1)).saveAllAndFlush(anyList());
     }
 
     @Test
     public void shouldNotAddStudentsWhenListIsNull() {
         studentService.addStudents(null);
 
-        verify(studentDao, never()).saveAllItems(anyList());
+        verify(studentRepository, never()).saveAllAndFlush(anyList());
     }
 
     @Test
     public void shouldNotAddStudentsWhenListIsEmpty() {
         studentService.addStudents(Collections.emptyList());
 
-        verify(studentDao, never()).saveAllItems(anyList());
+        verify(studentRepository, never()).saveAllAndFlush(anyList());
     }
 
     @Test
@@ -81,7 +84,7 @@ class StudentServiceTest {
         List<StudentDTO> studentListWithInvalid = Arrays.asList(new StudentDTO(), null);
         studentService.addStudents(studentListWithInvalid);
 
-        verify(studentDao, never()).saveAllItems(anyList());
+        verify(studentRepository, never()).saveAllAndFlush(anyList());
     }
 
     @Test

@@ -3,6 +3,7 @@ package dev.alexcoss.service;
 import dev.alexcoss.dao.JPAGroupDao;
 import dev.alexcoss.dto.GroupDTO;
 import dev.alexcoss.model.Group;
+import dev.alexcoss.repository.GroupRepository;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import static org.mockito.Mockito.*;
 class GroupServiceTest {
     @MockBean
     private JPAGroupDao groupDao;
+    @MockBean
+    private GroupRepository groupRepository;
 
     @Autowired
     private GroupService groupService;
@@ -52,21 +55,21 @@ class GroupServiceTest {
         List<GroupDTO> groupDtoList = getSampleGroupDtoList();
         groupService.addGroups(groupDtoList);
 
-        verify(groupDao, times(1)).saveAllItems(getSampleGroupEntityList());
+        verify(groupRepository, times(1)).saveAllAndFlush(getSampleGroupEntityList());
     }
 
     @Test
     public void shouldNotAddGroupsWhenListIsNull() {
         groupService.addGroups(null);
 
-        verify(groupDao, never()).saveAllItems(anyList());
+        verify(groupRepository, never()).saveAllAndFlush(anyList());
     }
 
     @Test
     public void shouldNotAddGroupsWhenListIsEmpty() {
         groupService.addGroups(Collections.emptyList());
 
-        verify(groupDao, never()).saveAllItems(anyList());
+        verify(groupRepository, never()).saveAllAndFlush(anyList());
     }
 
     @Test
@@ -74,7 +77,7 @@ class GroupServiceTest {
         List<GroupDTO> groupListWithNull = Arrays.asList(new GroupDTO(), null);
         groupService.addGroups(groupListWithNull);
 
-        verify(groupDao, never()).saveAllItems(anyList());
+        verify(groupRepository, never()).saveAllAndFlush(anyList());
     }
 
     private Group getGroup(int id, String name) {

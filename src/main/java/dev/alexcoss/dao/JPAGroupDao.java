@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Repository
 @Slf4j
 @RequiredArgsConstructor
-public class JPAGroupDao implements GroupDao<Group, List<Group>> {
+public class JPAGroupDao implements GroupDao<Group> {
 
     private static final String SELECT_ALL_HQL = "SELECT g FROM Group g";
     private static final String SELECT_ALL_WITH_STUDENTS_HQL = """
@@ -40,19 +40,6 @@ public class JPAGroupDao implements GroupDao<Group, List<Group>> {
             log.info("Adding group to database: {}", group);
         } catch (DataAccessException e) {
             log.error("Error adding group to database \nParameters: {}", group, e);
-        }
-    }
-
-    @Override
-    @Transactional
-    public void saveAllItems(List<Group> groupList) {
-        try {
-            for (Group group : groupList) {
-                entityManager.persist(group);
-            }
-            log.info("Adding groups to database: {}", groupList);
-        } catch (DataAccessException e) {
-            log.error("Error adding groups to database \nParameters: {}", groupList, e);
         }
     }
 

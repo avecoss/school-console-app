@@ -3,6 +3,7 @@ package dev.alexcoss.service;
 import dev.alexcoss.dao.JPACourseDao;
 import dev.alexcoss.dto.CourseDTO;
 import dev.alexcoss.model.Course;
+import dev.alexcoss.repository.CourseRepository;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ import static org.mockito.Mockito.*;
 class CourseServiceTest {
     @MockBean
     private JPACourseDao courseDao;
+    @MockBean
+    private CourseRepository courseRepository;
 
     @Autowired
     private CourseService courseService;
@@ -42,7 +45,7 @@ class CourseServiceTest {
 
         courseService.addCourses(validCourses);
 
-        verify(courseDao).saveAllItems(getSampleCourseEntityList());
+        verify(courseRepository).saveAllAndFlush(getSampleCourseEntityList());
     }
 
     @Test
@@ -55,7 +58,7 @@ class CourseServiceTest {
 
         courseService.addCourses(invalidCourses);
 
-        verify(courseDao, never()).saveAllItems(anyList());
+        verify(courseRepository, never()).saveAllAndFlush(anyList());
     }
 
     private Course getCourse(int id, String name, String description) {

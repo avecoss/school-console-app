@@ -1,10 +1,10 @@
 package dev.alexcoss.dao;
 
-public interface Dao<T, E> {
+import java.util.List;
+
+public interface Dao<T> {
 
     void saveItem(T item);
 
-    E findAllItems();
-
-    void saveAllItems(E items);
+    List<T> findAllItems();
 }

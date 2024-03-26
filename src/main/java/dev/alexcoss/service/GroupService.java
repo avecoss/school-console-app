@@ -3,10 +3,12 @@ package dev.alexcoss.service;
 import dev.alexcoss.dao.JPAGroupDao;
 import dev.alexcoss.dto.GroupDTO;
 import dev.alexcoss.model.Group;
+import dev.alexcoss.repository.GroupRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -17,12 +19,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GroupService{
 
-    private final JPAGroupDao groupRepository;
+    private final JPAGroupDao jpaGroupDao;
+    private final GroupRepository groupRepository;
     private final ModelMapper modelMapper;
 
     public List<GroupDTO> getGroups() {
         log.info("Getting all groups from the database");
-        List<Group> groups = groupRepository.findAllItems();
+        List<Group> groups = jpaGroupDao.findAllItems();
 
         List<GroupDTO> groupDTOList = groups.stream()
             .map(group -> modelMapper.map(group, GroupDTO.class))
@@ -33,7 +36,7 @@ public class GroupService{
     }
 
     public Map<GroupDTO, Integer> getAllGroupsWithStudents() {
-        Map<GroupDTO, Integer> groupsWithStudents = groupRepository.findAllGroupsWithStudents()
+        Map<GroupDTO, Integer> groupsWithStudents = jpaGroupDao.findAllGroupsWithStudents()
             .entrySet()
             .stream()
             .collect(Collectors.toMap(
@@ -45,13 +48,14 @@ public class GroupService{
         return groupsWithStudents;
     }
 
+    @Transactional
     public void addGroups(List<GroupDTO> groupList) {
         if (isValidGroupList(groupList)) {
             List<Group> groups = groupList.stream()
                 .map(groupDTO -> modelMapper.map(groupDTO, Group.class))
                 .toList();
 
-            groupRepository.saveAllItems(groups);
+            groupRepository.saveAllAndFlush(groups);
             log.info("Added {} groups to the database", groups.size());
         }
     }

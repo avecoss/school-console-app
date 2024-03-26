@@ -1,6 +1,7 @@
 package dev.alexcoss.dao;
 
 import dev.alexcoss.model.Course;
+import dev.alexcoss.repository.CourseRepository;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,8 @@ class JPACourseDaoTest {
     private Flyway flyway;
     @Autowired
     private JPACourseDao courseDao;
+    @Autowired
+    private CourseRepository courseRepository;
 
     @BeforeEach
     void setUp() {
@@ -57,7 +60,7 @@ class JPACourseDaoTest {
         courseList.add(Course.builder().name("Test2").build());
         courseList.add(Course.builder().name("Test3").build());
 
-        courseDao.saveAllItems(courseList);
+        courseRepository.saveAllAndFlush(courseList);
 
         List<Course> retrievedCourses = courseDao.findAllItems();
 

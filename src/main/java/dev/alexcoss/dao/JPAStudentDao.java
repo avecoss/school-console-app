@@ -16,7 +16,7 @@ import java.util.Optional;
 @Repository
 @Slf4j
 @RequiredArgsConstructor
-public class JPAStudentDao implements StudentDao<Student, List<Student>> {
+public class JPAStudentDao implements StudentDao<Student> {
 
     private static final String SELECT_ALL_HQL = "SELECT s FROM Student s";
     private static final String SELECT_STUDENTS_IN_COURSE_HQL = """
@@ -87,19 +87,6 @@ public class JPAStudentDao implements StudentDao<Student, List<Student>> {
         } catch (DataAccessException e) {
             log.error("Error getting students from database. \nHQL: {}", SELECT_ALL_HQL, e);
             return Collections.emptyList();
-        }
-    }
-
-    @Override
-    @Transactional
-    public void saveAllItems(List<Student> studentList) {
-        try {
-            for (Student student : studentList) {
-                entityManager.persist(student);
-            }
-            log.info("Adding students to database: {}", studentList);
-        } catch (DataAccessException e) {
-            log.error("Error adding students to database. \nParameters: {}", studentList, e);
         }
     }
 

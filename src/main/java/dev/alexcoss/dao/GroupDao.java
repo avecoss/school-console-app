@@ -2,6 +2,6 @@ package dev.alexcoss.dao;
 
 import java.util.Map;
 
-public interface GroupDao<T, E> extends Dao<T, E> {
+public interface GroupDao<T> extends Dao<T> {
     Map<T, Integer> findAllGroupsWithStudents();
 }

@@ -1,6 +1,7 @@
 package dev.alexcoss.dao;
 
 import dev.alexcoss.model.Group;
+import dev.alexcoss.repository.GroupRepository;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,8 @@ class JPAGroupDaoTest {
     private Flyway flyway;
     @Autowired
     private JPAGroupDao groupDao;
+    @Autowired
+    private GroupRepository groupRepository;
 
     @BeforeEach
     void setUp() {
@@ -55,7 +58,7 @@ class JPAGroupDaoTest {
         groupList.add(Group.builder().name("Test2").build());
         groupList.add(Group.builder().name("Test3").build());
 
-        groupDao.saveAllItems(groupList);
+        groupRepository.saveAllAndFlush(groupList);
 
         List<Group> retrievedGroups = groupDao.findAllItems();
 
@@ -71,7 +74,7 @@ class JPAGroupDaoTest {
         groupList.add(Group.builder().name("Test2").build());
         groupList.add(Group.builder().name("Test3").build());
 
-        groupDao.saveAllItems(groupList);
+        groupRepository.saveAllAndFlush(groupList);
 
         List<Group> retrievedGroups = groupDao.findAllItems();
 

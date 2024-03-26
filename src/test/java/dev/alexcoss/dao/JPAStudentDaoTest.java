@@ -1,6 +1,7 @@
 package dev.alexcoss.dao;
 
 import dev.alexcoss.model.Student;
+import dev.alexcoss.repository.StudentRepository;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,8 @@ class JPAStudentDaoTest {
     private Flyway flyway;
     @Autowired
     private JPAStudentDao studentDao;
+    @Autowired
+    private StudentRepository studentRepository;
 
     @BeforeEach
     void setUp() {
@@ -91,7 +94,7 @@ class JPAStudentDaoTest {
         students.add(Student.builder().firstName("Jane").lastName("Doe").build());
         students.add(Student.builder().firstName("Jim").lastName("Doe").build());
 
-        studentDao.saveAllItems(students);
+        studentRepository.saveAllAndFlush(students);
 
         List<Student> retrievedStudents = studentDao.findAllItems();
 

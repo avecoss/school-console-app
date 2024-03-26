@@ -16,7 +16,7 @@ import java.util.Optional;
 @Repository
 @Slf4j
 @RequiredArgsConstructor
-public class JPACourseDao implements CourseDao<Course, List<Course>> {
+public class JPACourseDao implements CourseDao<Course> {
     private static final String SELECT_ALL_HQL = "SELECT c FROM Course c";
 
     @PersistenceContext
@@ -41,19 +41,6 @@ public class JPACourseDao implements CourseDao<Course, List<Course>> {
             log.info("Adding course to database: {}", course);
         } catch (DataAccessException e) {
             log.error("Error adding course to database. \nParameters: {}", course, e);
-        }
-    }
-
-    @Override
-    @Transactional
-    public void saveAllItems(List<Course> courseList) {
-        try {
-            for (Course course : courseList) {
-                entityManager.persist(course);
-            }
-            log.info("Adding courses to database: {}", courseList);
-        } catch (DataAccessException e) {
-            log.error("Error adding courses to database. \nParameters: {}", courseList, e);
         }
     }
 
