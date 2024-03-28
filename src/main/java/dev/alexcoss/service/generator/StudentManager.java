@@ -22,12 +22,10 @@ public class StudentManager {
 
     public void generateAndSaveStudentsToDatabase() {
         List<StudentDTO> students = studentGenerator.generateStudents();
-        log.info("Generated {} students", students.size());
 
         List<GroupDTO> groupsFromDatabase = groupService.getGroups();
         List<StudentDTO> studentsInGroups = groupRandomizer.assignStudentsToGroups(students, groupsFromDatabase);
 
         studentService.addStudents(studentsInGroups);
-        log.info("Students generated and saved to the database");
     }
 }

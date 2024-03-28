@@ -24,28 +24,21 @@ public class GroupService{
     private final ModelMapper modelMapper;
 
     public List<GroupDTO> getGroups() {
-        log.info("Getting all groups from the database");
         List<Group> groups = jpaGroupDao.findAllItems();
 
-        List<GroupDTO> groupDTOList = groups.stream()
+        return groups.stream()
             .map(group -> modelMapper.map(group, GroupDTO.class))
             .toList();
-
-        log.info("Retrieved {} groups from the database", groupDTOList.size());
-        return groupDTOList;
     }
 
     public Map<GroupDTO, Integer> getAllGroupsWithStudents() {
-        Map<GroupDTO, Integer> groupsWithStudents = jpaGroupDao.findAllGroupsWithStudents()
+        return jpaGroupDao.findAllGroupsWithStudents()
             .entrySet()
             .stream()
             .collect(Collectors.toMap(
                 entry -> modelMapper.map(entry.getKey(), GroupDTO.class),
                 Map.Entry::getValue
             ));
-
-        log.info("Retrieved all groups with students from the database");
-        return groupsWithStudents;
     }
 
     @Transactional
@@ -56,7 +49,6 @@ public class GroupService{
                 .toList();
 
             groupRepository.saveAllAndFlush(groups);
-            log.info("Added {} groups to the database", groups.size());
         }
     }
 

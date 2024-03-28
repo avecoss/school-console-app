@@ -38,7 +38,6 @@ public class JPACourseDao implements CourseDao<Course> {
     public void saveItem(Course course) {
         try {
             entityManager.persist(course);
-            log.info("Adding course to database: {}", course);
         } catch (DataAccessException e) {
             log.error("Error adding course to database. \nParameters: {}", course, e);
         }
@@ -47,9 +46,7 @@ public class JPACourseDao implements CourseDao<Course> {
     @Override
     public List<Course> findAllItems() {
         try {
-            List<Course> courseList = entityManager.createQuery(SELECT_ALL_HQL, Course.class).getResultList();
-            log.info("Getting courses from database: {}", courseList);
-            return courseList;
+            return entityManager.createQuery(SELECT_ALL_HQL, Course.class).getResultList();
         } catch (DataAccessException e) {
             log.error("Error getting courses from database. \nHQL: {}", SELECT_ALL_HQL, e);
             return Collections.emptyList();

@@ -25,26 +25,18 @@ public class StudentService {
 
     public Optional<StudentDTO> getStudentById(int id) {
         return jpaStudentDao.findItemById(id)
-            .map(student -> {
-                log.info("Found student with ID {}: {}", id, student);
-                return modelMapper.map(student, StudentDTO.class);
-            });
+            .map(student -> modelMapper.map(student, StudentDTO.class));
+
     }
 
     public List<StudentDTO> getStudentsByCourse(String courseName) {
         List<Student> students = jpaStudentDao.findStudentsByCourse(courseName);
-        List<StudentDTO> studentDTOList = getStudentDTOList(students);
-        log.info("Found {} students for course: {}", studentDTOList.size(), courseName);
-
-        return studentDTOList;
+        return getStudentDTOList(students);
     }
 
     public List<StudentDTO> getStudents() {
         List<Student> students = jpaStudentDao.findAllItems();
-        List<StudentDTO> studentDTOList = getStudentDTOList(students);
-        log.info("Found {} students", studentDTOList.size());
-
-        return studentDTOList;
+        return getStudentDTOList(students);
     }
 
     @Transactional
@@ -55,14 +47,12 @@ public class StudentService {
                 .toList();
 
             studentRepository.saveAllAndFlush(students);
-            log.info("Added {} students to the repository", studentList.size());
         }
     }
 
     public void addStudent(StudentDTO student) {
         if (isValidStudent(student)) {
             jpaStudentDao.saveItem(modelMapper.map(student, Student.class));
-            log.info("Added student to the repository: {}", student);
         } else {
             log.error("Invalid student data: First name or last name is empty");
         }
@@ -73,7 +63,6 @@ public class StudentService {
 
         if (existingStudent.isPresent()) {
             jpaStudentDao.deleteItemById(studentId);
-            log.info("Removed student with ID {}", studentId);
         } else {
             throw new NoSuchElementException("Student with ID " + studentId + " not found");
         }

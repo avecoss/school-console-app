@@ -34,7 +34,6 @@ public class StudentCourseService {
                         });
                 });
             });
-            log.info("Added all student-course relationships to the database");
         }
     }
 
@@ -46,7 +45,6 @@ public class StudentCourseService {
 
             if (studentById.isPresent() && courseById.isPresent()) {
                 courseById.get().addStudentToCourse(studentById.get());
-                log.info("Added student with ID {} to the course with ID {}", studentId, courseId);
             }
         }
     }
@@ -59,7 +57,6 @@ public class StudentCourseService {
 
             if (studentById.isPresent() && courseById.isPresent()) {
                 courseById.get().removeStudentFromCourse(studentById.get());
-                log.info("Removed student with ID {} from the course with ID {}", studentId, courseId);
             }
         }
     }

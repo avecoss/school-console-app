@@ -23,14 +23,10 @@ public class CourseService {
 
     public List<CourseDTO> getCourses() {
         List<Course> courses = jpaCourseDao.findAllItems();
-        log.info("Getting all courses from the database");
 
-        List<CourseDTO> courseDTOList = courses.stream()
+        return courses.stream()
             .map(course -> modelMapper.map(course, CourseDTO.class))
             .toList();
-
-        log.info("Retrieved {} courses from the database", courseDTOList.size());
-        return courseDTOList;
     }
 
     @Transactional
@@ -41,7 +37,6 @@ public class CourseService {
                 .toList();
 
             courseRepository.saveAllAndFlush(courses);
-            log.info("Added {} courses to the database", courses.size());
         }
     }
 

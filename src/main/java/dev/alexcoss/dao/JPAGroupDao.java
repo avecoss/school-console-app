@@ -36,8 +36,6 @@ public class JPAGroupDao implements GroupDao<Group> {
     public void saveItem(Group group) {
         try {
             entityManager.persist(group);
-
-            log.info("Adding group to database: {}", group);
         } catch (DataAccessException e) {
             log.error("Error adding group to database \nParameters: {}", group, e);
         }
@@ -46,10 +44,7 @@ public class JPAGroupDao implements GroupDao<Group> {
     @Override
     public List<Group> findAllItems() {
         try {
-            List<Group> groups = entityManager.createQuery(SELECT_ALL_HQL, Group.class).getResultList();
-
-            log.info("Getting groups from database: {}", groups);
-            return groups;
+            return entityManager.createQuery(SELECT_ALL_HQL, Group.class).getResultList();
         } catch (DataAccessException e) {
             log.error("Error getting groups from database. \nHQL: {}", SELECT_ALL_HQL, e);
             return Collections.emptyList();
@@ -61,14 +56,11 @@ public class JPAGroupDao implements GroupDao<Group> {
         try {
             List<Object[]> results = entityManager.createQuery(SELECT_ALL_WITH_STUDENTS_HQL, Object[].class).getResultList();
 
-            Map<Group, Integer> groupsWithStudents = results.stream()
+            return results.stream()
                 .collect(Collectors.toMap(
                     result -> (Group) result[0],
                     result -> ((Long) result[1]).intValue()
                 ));
-
-            log.info("Getting all groups with students from database: {}", groupsWithStudents);
-            return groupsWithStudents;
         } catch (DataAccessException e) {
             log.error("Error getting all groups with students from database. \nSQL: {}", SELECT_ALL_WITH_STUDENTS_HQL, e);
             return Collections.emptyMap();

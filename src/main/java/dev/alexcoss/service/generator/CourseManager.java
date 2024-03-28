@@ -18,8 +18,6 @@ public class CourseManager {
 
     public void generateAndSaveCoursesToDatabase() {
         List<CourseDTO> courses = coursesGenerator.getCoursesList();
-        log.info("Generated {} courses", courses.size());
         courseService.addCourses(courses);
-        log.info("Courses saved to the database");
     }
 }

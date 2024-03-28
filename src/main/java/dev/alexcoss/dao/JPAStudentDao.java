@@ -33,7 +33,6 @@ public class JPAStudentDao implements StudentDao<Student> {
     public void saveItem(Student student) {
         try {
             entityManager.persist(student);
-            log.info("Adding student to database: {}", student);
         } catch (DataAccessException e) {
             log.error("Error adding student to database. \nParameters: {}", student, e);
         }
@@ -44,7 +43,6 @@ public class JPAStudentDao implements StudentDao<Student> {
     public void updateItem(Student updateStudent) {
         try {
             entityManager.merge(updateStudent);
-            log.info("Updating student to database: {}", updateStudent);
         } catch (DataAccessException e) {
             log.error("Error updating student to database. \nParameters: {}", updateStudent, e);
         }
@@ -69,7 +67,6 @@ public class JPAStudentDao implements StudentDao<Student> {
 
             if (student != null) {
                 entityManager.remove(student);
-                log.info("Removing student from database: {}", studentId);
             } else {
                 log.warn("Student with ID {} not found in the database. No deletion performed.", studentId);
             }
@@ -81,9 +78,7 @@ public class JPAStudentDao implements StudentDao<Student> {
     @Override
     public List<Student> findAllItems() {
         try {
-            List<Student> studentList = entityManager.createQuery(SELECT_ALL_HQL, Student.class).getResultList();
-            log.info("Getting students from database: {}", studentList);
-            return studentList;
+            return entityManager.createQuery(SELECT_ALL_HQL, Student.class).getResultList();
         } catch (DataAccessException e) {
             log.error("Error getting students from database. \nHQL: {}", SELECT_ALL_HQL, e);
             return Collections.emptyList();
@@ -93,11 +88,9 @@ public class JPAStudentDao implements StudentDao<Student> {
     @Override
     public List<Student> findStudentsByCourse(String courseName) {
         try {
-            List<Student> students = entityManager.createQuery(SELECT_STUDENTS_IN_COURSE_HQL, Student.class)
-                .setParameter("courseName", courseName).getResultList();
 
-            log.info("Getting students by course from database: {} \nCourse name: {}", students, courseName);
-            return students;
+            return entityManager.createQuery(SELECT_STUDENTS_IN_COURSE_HQL, Student.class)
+                .setParameter("courseName", courseName).getResultList();
         } catch (DataAccessException e) {
             log.error("Error getting students by course from database. \nHQL: {} \nCourse name: {}", SELECT_STUDENTS_IN_COURSE_HQL, courseName, e);
             return Collections.emptyList();
