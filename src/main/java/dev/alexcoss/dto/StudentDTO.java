@@ -1,37 +1,21 @@
 package dev.alexcoss.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.util.Objects;
+import lombok.*;
 
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class StudentDTO {
-    private final Integer defaultInteger = -1;
 
     private int id;
     private String firstName;
     private String lastName;
-    private Integer groupId = defaultInteger;
-
-
-    public StudentDTO(int id, String firstName, String lastName) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
-    public void setGroupId(Integer groupId) {
-        this.groupId = Objects.requireNonNullElse(groupId, defaultInteger);
-    }
+    private GroupDTO group;
 
     @Override
     public String toString() {
-        return String.format("\n%s %s groupId:%d", firstName, lastName, groupId);
+        return String.format("\n%s %s Group: %s", firstName, lastName, group);
     }
 }

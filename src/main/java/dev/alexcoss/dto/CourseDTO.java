@@ -1,22 +1,16 @@
 package dev.alexcoss.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CourseDTO {
     private int id;
     private String name;
     private String description = "default description";
-
-    public CourseDTO(String name) {
-        this.name = name;
-    }
 
     @Override
     public String toString() {

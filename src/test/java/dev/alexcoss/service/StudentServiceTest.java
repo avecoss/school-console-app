@@ -1,8 +1,9 @@
 package dev.alexcoss.service;
 
-import dev.alexcoss.dao.StudentDao;
+import dev.alexcoss.dao.JPAStudentDao;
 import dev.alexcoss.dto.StudentDTO;
 import dev.alexcoss.model.Student;
+import dev.alexcoss.repository.StudentRepository;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,9 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = {StudentService.class, ModelMapper.class})
 class StudentServiceTest {
     @MockBean
-    private StudentDao studentDao;
+    private JPAStudentDao studentDao;
+    @MockBean
+    private StudentRepository studentRepository;
 
     @Autowired
     private StudentService studentService;
@@ -25,33 +28,33 @@ class StudentServiceTest {
     @Test
     public void shouldGetStudentById() {
         int studentId = 1;
-        when(studentDao.getStudentById(studentId)).thenReturn(Optional.of(getStudent(1, "John", "Doe")));
+        when(studentDao.findItemById(studentId)).thenReturn(Optional.of(getStudent(1, "John", "Doe")));
 
         Optional<StudentDTO> student = studentService.getStudentById(studentId);
 
         assertTrue(student.isPresent());
-        verify(studentDao).getStudentById(studentId);
+        verify(studentDao).findItemById(studentId);
     }
 
     @Test
     public void shouldGetStudentsByCourse() {
         String courseName = "Math";
-        when(studentDao.getStudentsByCourse(courseName)).thenReturn(getSampleStudentEntityList());
+        when(studentDao.findStudentsByCourse(courseName)).thenReturn(getSampleStudentEntityList());
 
         List<StudentDTO> students = studentService.getStudentsByCourse(courseName);
 
         assertNotNull(students);
-        verify(studentDao).getStudentsByCourse(courseName);
+        verify(studentDao).findStudentsByCourse(courseName);
     }
 
     @Test
     public void shouldGetAllStudents() {
-        when(studentDao.getAllItems()).thenReturn(getSampleStudentEntityList());
+        when(studentDao.findAllItems()).thenReturn(getSampleStudentEntityList());
 
         List<StudentDTO> students = studentService.getStudents();
 
         assertNotNull(students);
-        verify(studentDao).getAllItems();
+        verify(studentDao).findAllItems();
     }
 
     @Test
@@ -59,21 +62,21 @@ class StudentServiceTest {
         List<StudentDTO> studentList = getSampleStudentDtoList();
         studentService.addStudents(studentList);
 
-        verify(studentDao, times(1)).addAllItems(anyList());
+        verify(studentRepository, times(1)).saveAllAndFlush(anyList());
     }
 
     @Test
     public void shouldNotAddStudentsWhenListIsNull() {
         studentService.addStudents(null);
 
-        verify(studentDao, never()).addAllItems(anyList());
+        verify(studentRepository, never()).saveAllAndFlush(anyList());
     }
 
     @Test
     public void shouldNotAddStudentsWhenListIsEmpty() {
         studentService.addStudents(Collections.emptyList());
 
-        verify(studentDao, never()).addAllItems(anyList());
+        verify(studentRepository, never()).saveAllAndFlush(anyList());
     }
 
     @Test
@@ -81,15 +84,15 @@ class StudentServiceTest {
         List<StudentDTO> studentListWithInvalid = Arrays.asList(new StudentDTO(), null);
         studentService.addStudents(studentListWithInvalid);
 
-        verify(studentDao, never()).addAllItems(anyList());
+        verify(studentRepository, never()).saveAllAndFlush(anyList());
     }
 
     @Test
     public void shouldAddValidStudent() {
-        StudentDTO validStudent = new StudentDTO(1, "John", "Doe");
+        StudentDTO validStudent = StudentDTO.builder().id(1).firstName("John").lastName("Doe").build();
         studentService.addStudent(validStudent);
 
-        verify(studentDao, times(1)).addItem(getStudent(1, "John", "Doe"));
+        verify(studentDao, times(1)).saveItem(getStudent(1, "John", "Doe"));
     }
 
     @Test
@@ -97,28 +100,28 @@ class StudentServiceTest {
         StudentDTO invalidStudent = new StudentDTO();
         studentService.addStudent(invalidStudent);
 
-        verify(studentDao, never()).addItem(any());
+        verify(studentDao, never()).saveItem(any());
     }
 
     @Test
     public void shouldRemoveExistingStudentById() {
         int existingStudentId = 1;
-        when(studentDao.getStudentById(existingStudentId)).thenReturn(Optional.of(getStudent(1, "John", "Doe")));
+        when(studentDao.findItemById(existingStudentId)).thenReturn(Optional.of(getStudent(1, "John", "Doe")));
 
         studentService.removeStudentById(existingStudentId);
 
-        verify(studentDao, times(1)).removeStudentById(existingStudentId);
+        verify(studentDao, times(1)).deleteItemById(existingStudentId);
     }
 
     @Test
     public void shouldNotRemoveNonExistingStudentById() {
         int nonExistingStudentId = 99;
-        when(studentDao.getStudentById(nonExistingStudentId)).thenReturn(Optional.empty());
+        when(studentDao.findItemById(nonExistingStudentId)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> {
             studentService.removeStudentById(nonExistingStudentId);
         });
-        verify(studentDao, never()).removeStudentById(nonExistingStudentId);
+        verify(studentDao, never()).deleteItemById(nonExistingStudentId);
     }
 
     private Student getStudent(int id, String firstName, String lastName) {
@@ -135,6 +138,9 @@ class StudentServiceTest {
     }
 
     private List<StudentDTO> getSampleStudentDtoList() {
-        return Arrays.asList(new StudentDTO(1, "John", "Doe"), new StudentDTO(2, "Jane", "Smith"));
+        return Arrays.asList(
+            StudentDTO.builder().id(1).firstName("John").lastName("Doe").build(),
+            StudentDTO.builder().id(2).firstName("Jane").lastName("Smith").build()
+        );
     }
 }

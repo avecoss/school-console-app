@@ -7,12 +7,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 
 import java.util.List;
 
 @SpringBootApplication
+@EntityScan(basePackages = "dev.alexcoss")
 public class SchoolConsoleApplication {
 
     public static void main(String[] args) {

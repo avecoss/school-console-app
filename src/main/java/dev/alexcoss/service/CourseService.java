@@ -1,12 +1,14 @@
 package dev.alexcoss.service;
 
-import dev.alexcoss.dao.CourseDao;
+import dev.alexcoss.dao.JPACourseDao;
 import dev.alexcoss.dto.CourseDTO;
 import dev.alexcoss.model.Course;
+import dev.alexcoss.repository.CourseRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,29 +17,26 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CourseService {
 
-    private final CourseDao courseRepository;
+    private final JPACourseDao jpaCourseDao;
+    private final CourseRepository courseRepository;
     private final ModelMapper modelMapper;
 
     public List<CourseDTO> getCourses() {
-        List<Course> courses = courseRepository.getAllItems();
-        log.info("Getting all courses from the database");
+        List<Course> courses = jpaCourseDao.findAllItems();
 
-        List<CourseDTO> courseDTOList = courses.stream()
+        return courses.stream()
             .map(course -> modelMapper.map(course, CourseDTO.class))
             .toList();
-
-        log.info("Retrieved {} courses from the database", courseDTOList.size());
-        return courseDTOList;
     }
 
+    @Transactional
     public void addCourses(List<CourseDTO> courseList) {
         if (isValidCourseList(courseList)) {
             List<Course> courses = courseList.stream()
                 .map(courseDTO -> modelMapper.map(courseDTO, Course.class))
                 .toList();
 
-            courseRepository.addAllItems(courses);
-            log.info("Added {} courses to the database", courses.size());
+            courseRepository.saveAllAndFlush(courses);
         }
     }
 

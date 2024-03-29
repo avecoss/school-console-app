@@ -1,13 +1,15 @@
 package dev.alexcoss.dao;
 
 import dev.alexcoss.model.Group;
+import dev.alexcoss.repository.GroupRepository;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -21,28 +23,28 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Testcontainers
 @ActiveProfiles("test")
-@JdbcTest
+@DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {JPAGroupDao.class}))
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class GroupDaoTest {
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+class JPAGroupDaoTest {
     @Autowired
     private Flyway flyway;
-    private GroupDao groupDao;
+    @Autowired
+    private JPAGroupDao groupDao;
+    @Autowired
+    private GroupRepository groupRepository;
 
     @BeforeEach
     void setUp() {
         flyway.clean();
-        groupDao = new GroupDao(jdbcTemplate);
         flyway.migrate();
     }
 
     @Test
     void shouldAddItem() {
-        Group group = getTestGroup();
-        groupDao.addItem(group);
+        Group group = Group.builder().name("Test").build();
+        groupDao.saveItem(group);
 
-        List<Group> retrievedCourses = groupDao.getAllItems();
+        List<Group> retrievedCourses = groupDao.findAllItems();
 
         assertNotNull(retrievedCourses);
         assertEquals(1, retrievedCourses.size());
@@ -52,13 +54,13 @@ class GroupDaoTest {
     @Test
     void shouldAddAllItems() {
         List<Group> groupList = new ArrayList<>();
-        groupList.add(getTestGroup(1,"Test1"));
-        groupList.add(getTestGroup(2,"Test2"));
-        groupList.add(getTestGroup(3,"Test3"));
+        groupList.add(Group.builder().name("Test1").build());
+        groupList.add(Group.builder().name("Test2").build());
+        groupList.add(Group.builder().name("Test3").build());
 
-        groupDao.addAllItems(groupList);
+        groupRepository.saveAllAndFlush(groupList);
 
-        List<Group> retrievedGroups = groupDao.getAllItems();
+        List<Group> retrievedGroups = groupDao.findAllItems();
 
         assertNotNull(retrievedGroups);
         assertEquals(groupList.size(), retrievedGroups.size());
@@ -68,13 +70,13 @@ class GroupDaoTest {
     @Test
     void shouldGetAllItems() {
         List<Group> groupList = new ArrayList<>();
-        groupList.add(getTestGroup(1,"Test1"));
-        groupList.add(getTestGroup(2,"Test2"));
-        groupList.add(getTestGroup(3,"Test3"));
+        groupList.add(Group.builder().name("Test1").build());
+        groupList.add(Group.builder().name("Test2").build());
+        groupList.add(Group.builder().name("Test3").build());
 
-        groupDao.addAllItems(groupList);
+        groupRepository.saveAllAndFlush(groupList);
 
-        List<Group> retrievedGroups = groupDao.getAllItems();
+        List<Group> retrievedGroups = groupDao.findAllItems();
 
         assertNotNull(retrievedGroups);
         assertEquals(groupList.size(), retrievedGroups.size());
@@ -91,27 +93,11 @@ class GroupDaoTest {
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
     void shouldGetAllGroupsWithStudents() {
-        Map<Group, Integer> result = groupDao.getAllGroupsWithStudents();
+        Map<Group, Integer> result = groupDao.findAllGroupsWithStudents();
 
         assertNotNull(result);
         assertEquals(2, result.size());
 
-        assertEquals(2, result.get(getTestGroup(1, "Test1")));
-    }
-
-    private Group getTestGroup() {
-        Group group = new Group();
-        group.setId(1);
-        group.setName("Test");
-
-        return group;
-    }
-
-    private Group getTestGroup(int id, String name) {
-        Group group = new Group();
-        group.setId(id);
-        group.setName(name);
-
-        return group;
+        assertEquals(2, result.get(Group.builder().name("Test1").build()));
     }
 }

@@ -1,13 +1,14 @@
 package dev.alexcoss.service;
 
-import dev.alexcoss.dao.GroupDao;
+import dev.alexcoss.dao.JPAGroupDao;
 import dev.alexcoss.dto.GroupDTO;
 import dev.alexcoss.model.Group;
+import dev.alexcoss.repository.GroupRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -18,42 +19,36 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GroupService{
 
-    private final GroupDao groupRepository;
+    private final JPAGroupDao jpaGroupDao;
+    private final GroupRepository groupRepository;
     private final ModelMapper modelMapper;
 
     public List<GroupDTO> getGroups() {
-        log.info("Getting all groups from the database");
-        List<Group> groups = groupRepository.getAllItems();
+        List<Group> groups = jpaGroupDao.findAllItems();
 
-        List<GroupDTO> groupDTOList = groups.stream()
+        return groups.stream()
             .map(group -> modelMapper.map(group, GroupDTO.class))
             .toList();
-
-        log.info("Retrieved {} groups from the database", groupDTOList.size());
-        return groupDTOList;
     }
 
     public Map<GroupDTO, Integer> getAllGroupsWithStudents() {
-        Map<GroupDTO, Integer> groupsWithStudents = groupRepository.getAllGroupsWithStudents()
+        return jpaGroupDao.findAllGroupsWithStudents()
             .entrySet()
             .stream()
             .collect(Collectors.toMap(
                 entry -> modelMapper.map(entry.getKey(), GroupDTO.class),
                 Map.Entry::getValue
             ));
-
-        log.info("Retrieved all groups with students from the database");
-        return groupsWithStudents;
     }
 
+    @Transactional
     public void addGroups(List<GroupDTO> groupList) {
         if (isValidGroupList(groupList)) {
             List<Group> groups = groupList.stream()
                 .map(groupDTO -> modelMapper.map(groupDTO, Group.class))
                 .toList();
 
-            groupRepository.addAllItems(groups);
-            log.info("Added {} groups to the database", groups.size());
+            groupRepository.saveAllAndFlush(groups);
         }
     }
 

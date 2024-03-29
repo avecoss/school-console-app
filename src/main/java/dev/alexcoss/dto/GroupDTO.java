@@ -8,4 +8,9 @@ import lombok.*;
 public class GroupDTO {
     private int id;
     private String name;
+
+    @Override
+    public String toString() {
+        return String.format("%d Group name: %s", id, name);
+    }
 }

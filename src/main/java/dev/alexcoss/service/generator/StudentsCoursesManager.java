@@ -30,7 +30,6 @@ public class StudentsCoursesManager {
 
         if (!mapStudentCourses.isEmpty()) {
             studentCourseService.addAllStudentCourseRelationships(mapStudentCourses);
-            log.info("Students assigned to courses and relationships saved");
         } else {
             log.warn("No students assigned to courses");
         }

@@ -17,7 +17,6 @@ public class GroupManager {
 
     public void generateAndSaveGroupsToDatabase() {
         List<GroupDTO> groups = groupsGenerator.generateGroupList();
-        log.info("Generated {} groups", groups.size());
         groupService.addGroups(groups);
-        log.info("Groups saved to the database");}
+    }
 }

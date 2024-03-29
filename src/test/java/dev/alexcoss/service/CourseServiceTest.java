@@ -1,8 +1,9 @@
 package dev.alexcoss.service;
 
-import dev.alexcoss.dao.CourseDao;
+import dev.alexcoss.dao.JPACourseDao;
 import dev.alexcoss.dto.CourseDTO;
 import dev.alexcoss.model.Course;
+import dev.alexcoss.repository.CourseRepository;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,9 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = {CourseService.class, ModelMapper.class})
 class CourseServiceTest {
     @MockBean
-    private CourseDao courseDao;
+    private JPACourseDao courseDao;
+    @MockBean
+    private CourseRepository courseRepository;
 
     @Autowired
     private CourseService courseService;
@@ -26,14 +29,14 @@ class CourseServiceTest {
     @Test
     void shouldGetAllCourses() {
         List<Course> entityCourses = getSampleCourseEntityList();
-        when(courseDao.getAllItems()).thenReturn(entityCourses);
+        when(courseDao.findAllItems()).thenReturn(entityCourses);
 
         List<CourseDTO> expectedCourses = getSampleCourseDtoList();
         List<CourseDTO> actualCourses = courseService.getCourses();
 
         assertEquals(expectedCourses.size(), actualCourses.size());
         assertEquals(expectedCourses.get(0).getName(), actualCourses.get(0).getName());
-        verify(courseDao).getAllItems();
+        verify(courseDao).findAllItems();
     }
 
     @Test
@@ -42,7 +45,7 @@ class CourseServiceTest {
 
         courseService.addCourses(validCourses);
 
-        verify(courseDao).addAllItems(getSampleCourseEntityList());
+        verify(courseRepository).saveAllAndFlush(getSampleCourseEntityList());
     }
 
     @Test
@@ -55,7 +58,7 @@ class CourseServiceTest {
 
         courseService.addCourses(invalidCourses);
 
-        verify(courseDao, never()).addAllItems(anyList());
+        verify(courseRepository, never()).saveAllAndFlush(anyList());
     }
 
     private Course getCourse(int id, String name, String description) {

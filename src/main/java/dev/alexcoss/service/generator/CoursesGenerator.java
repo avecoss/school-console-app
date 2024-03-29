@@ -20,7 +20,7 @@ public class CoursesGenerator {
     }
 
     private CourseDTO createCourse(String name) {
-        return new CourseDTO(name);
+        return CourseDTO.builder().name(name).build();
     }
 
     private List<String> readList() {
