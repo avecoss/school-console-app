@@ -1,9 +1,9 @@
 package dev.alexcoss.service;
 
-import dev.alexcoss.dao.JPACourseDao;
-import dev.alexcoss.dao.JPAStudentDao;
 import dev.alexcoss.model.Course;
 import dev.alexcoss.model.Student;
+import dev.alexcoss.repository.CourseRepository;
+import dev.alexcoss.repository.StudentRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,10 +19,10 @@ class StudentCourseServiceTest {
     private StudentCourseService studentCourseService;
 
     @MockBean
-    private JPACourseDao courseDao;
+    private CourseRepository courseRepository;
 
     @MockBean
-    private JPAStudentDao studentDao;
+    private StudentRepository studentRepository;
 
     @Test
     public void shouldAddAllStudentCourseRelationships() {
@@ -35,32 +35,32 @@ class StudentCourseServiceTest {
         Course course31 = Course.builder().id(31).name("History").build();
         Course course33 = Course.builder().id(33).name("Physics").build();
 
-        when(studentDao.findItemById(1)).thenReturn(Optional.of(student1));
-        when(studentDao.findItemById(2)).thenReturn(Optional.of(student2));
-        when(courseDao.findItemById(30)).thenReturn(Optional.of(course30));
-        when(courseDao.findItemById(31)).thenReturn(Optional.of(course31));
-        when(courseDao.findItemById(33)).thenReturn(Optional.of(course33));
+        when(studentRepository.findById(1)).thenReturn(Optional.of(student1));
+        when(studentRepository.findById(2)).thenReturn(Optional.of(student2));
+        when(courseRepository.findById(30)).thenReturn(Optional.of(course30));
+        when(courseRepository.findById(31)).thenReturn(Optional.of(course31));
+        when(courseRepository.findById(33)).thenReturn(Optional.of(course33));
 
         studentCourseService.addAllStudentCourseRelationships(studentCourseMap);
 
-        verify(studentDao, times(2)).findItemById(anyInt());
-        verify(courseDao, times(4)).findItemById(anyInt());
+        verify(studentRepository, times(2)).findById(anyInt());
+        verify(courseRepository, times(4)).findById(anyInt());
     }
 
     @Test
     public void shouldNotAddAllStudentCourseRelationshipsWhenMapIsNull() {
         studentCourseService.addAllStudentCourseRelationships(null);
 
-        verify(courseDao, never()).findItemById(anyInt());
-        verify(studentDao, never()).findItemById(anyInt());
+        verify(courseRepository, never()).findById(anyInt());
+        verify(studentRepository, never()).findById(anyInt());
     }
 
     @Test
     public void shouldNotAddAllStudentCourseRelationshipsWhenMapIsEmpty() {
         studentCourseService.addAllStudentCourseRelationships(Collections.emptyMap());
 
-        verify(courseDao, never()).findItemById(anyInt());
-        verify(studentDao, never()).findItemById(anyInt());
+        verify(courseRepository, never()).findById(anyInt());
+        verify(studentRepository, never()).findById(anyInt());
     }
 
     @Test
@@ -70,29 +70,29 @@ class StudentCourseServiceTest {
         Student student = Student.builder().id(studentId).build();
         Course course = Course.builder().id(courseId).build();
 
-        when(studentDao.findItemById(studentId)).thenReturn(Optional.of(student));
-        when(courseDao.findItemById(courseId)).thenReturn(Optional.of(course));
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
 
         studentCourseService.addStudentToCourse(studentId, courseId);
 
-        verify(studentDao).findItemById(studentId);
-        verify(courseDao).findItemById(courseId);
+        verify(studentRepository).findById(studentId);
+        verify(courseRepository).findById(courseId);
     }
 
     @Test
     public void shouldNotAddStudentToCourseWhenStudentIdIsInvalid() {
         studentCourseService.addStudentToCourse(-1, 30);
 
-        verify(studentDao, never()).findItemById(anyInt());
-        verify(courseDao, never()).findItemById(anyInt());
+        verify(studentRepository, never()).findById(anyInt());
+        verify(courseRepository, never()).findById(anyInt());
     }
 
     @Test
     public void shouldNotAddStudentToCourseWhenCourseIdIsInvalid() {
         studentCourseService.addStudentToCourse(1, -30);
 
-        verify(studentDao, never()).findItemById(anyInt());
-        verify(courseDao, never()).findItemById(anyInt());
+        verify(studentRepository, never()).findById(anyInt());
+        verify(courseRepository, never()).findById(anyInt());
     }
 
     @Test
@@ -102,29 +102,29 @@ class StudentCourseServiceTest {
         Student student = Student.builder().id(studentId).build();
         Course course = Course.builder().id(courseId).build();
 
-        when(studentDao.findItemById(studentId)).thenReturn(Optional.of(student));
-        when(courseDao.findItemById(courseId)).thenReturn(Optional.of(course));
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
 
         studentCourseService.removeStudentFromCourse(studentId, courseId);
 
-        verify(studentDao).findItemById(studentId);
-        verify(courseDao).findItemById(courseId);
+        verify(studentRepository).findById(studentId);
+        verify(courseRepository).findById(courseId);
     }
 
     @Test
     public void shouldNotRemoveStudentFromCourseWhenStudentIdIsInvalid() {
         studentCourseService.removeStudentFromCourse(-1, 30);
 
-        verify(studentDao, never()).findItemById(anyInt());
-        verify(courseDao, never()).findItemById(anyInt());
+        verify(studentRepository, never()).findById(anyInt());
+        verify(courseRepository, never()).findById(anyInt());
     }
 
     @Test
     public void shouldNotRemoveStudentFromCourseWhenCourseIdIsInvalid() {
         studentCourseService.removeStudentFromCourse(1, -30);
 
-        verify(studentDao, never()).findItemById(anyInt());
-        verify(courseDao, never()).findItemById(anyInt());
+        verify(studentRepository, never()).findById(anyInt());
+        verify(courseRepository, never()).findById(anyInt());
     }
 
     private Map<Integer, Set<Integer>> getSampleStudentCourseMap() {

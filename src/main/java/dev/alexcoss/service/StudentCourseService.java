@@ -1,9 +1,9 @@
 package dev.alexcoss.service;
 
-import dev.alexcoss.dao.JPACourseDao;
-import dev.alexcoss.dao.JPAStudentDao;
 import dev.alexcoss.model.Course;
 import dev.alexcoss.model.Student;
+import dev.alexcoss.repository.CourseRepository;
+import dev.alexcoss.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,18 +16,19 @@ import java.util.Set;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class StudentCourseService {
 
-    private final JPACourseDao courseDao;
-    private final JPAStudentDao studentDao;
+    private final CourseRepository courseRepository;
+    private final StudentRepository studentRepository;
 
     @Transactional
     public void addAllStudentCourseRelationships(Map<Integer, Set<Integer>> studentCourseMap) {
         if (isValidStudentCourseMap(studentCourseMap)) {
             studentCourseMap.forEach((studentId, courseIds) -> {
-                studentDao.findItemById(studentId).ifPresent(student -> {
+                studentRepository.findById(studentId).ifPresent(student -> {
                     courseIds.stream()
-                        .map(courseDao::findItemById)
+                        .map(courseRepository::findById)
                         .flatMap(Optional::stream)
                         .forEach(course -> {
                             course.addStudentToCourse(student);
@@ -40,8 +41,8 @@ public class StudentCourseService {
     @Transactional
     public void addStudentToCourse(int studentId, int courseId) {
         if (isValidId(studentId, "Student ID") && isValidId(courseId, "Course ID")) {
-            Optional<Student> studentById = studentDao.findItemById(studentId);
-            Optional<Course> courseById = courseDao.findItemById(courseId);
+            Optional<Student> studentById = studentRepository.findById(studentId);
+            Optional<Course> courseById = courseRepository.findById(courseId);
 
             if (studentById.isPresent() && courseById.isPresent()) {
                 courseById.get().addStudentToCourse(studentById.get());
@@ -52,8 +53,8 @@ public class StudentCourseService {
     @Transactional
     public void removeStudentFromCourse(int studentId, int courseId) {
         if (isValidId(studentId, "Student ID") && isValidId(courseId, "Course ID")) {
-            Optional<Student> studentById = studentDao.findItemById(studentId);
-            Optional<Course> courseById = courseDao.findItemById(courseId);
+            Optional<Student> studentById = studentRepository.findById(studentId);
+            Optional<Course> courseById = courseRepository.findById(courseId);
 
             if (studentById.isPresent() && courseById.isPresent()) {
                 courseById.get().removeStudentFromCourse(studentById.get());

@@ -1,6 +1,5 @@
 package dev.alexcoss.service;
 
-import dev.alexcoss.dao.JPAStudentDao;
 import dev.alexcoss.dto.StudentDTO;
 import dev.alexcoss.model.Student;
 import dev.alexcoss.repository.StudentRepository;
@@ -17,25 +16,25 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class StudentService {
 
-    private final JPAStudentDao jpaStudentDao;
     private final StudentRepository studentRepository;
     private final ModelMapper modelMapper;
 
     public Optional<StudentDTO> getStudentById(int id) {
-        return jpaStudentDao.findItemById(id)
+        return studentRepository.findById(id)
             .map(student -> modelMapper.map(student, StudentDTO.class));
 
     }
 
     public List<StudentDTO> getStudentsByCourse(String courseName) {
-        List<Student> students = jpaStudentDao.findStudentsByCourse(courseName);
+        List<Student> students = studentRepository.findByCoursesName(courseName);
         return getStudentDTOList(students);
     }
 
     public List<StudentDTO> getStudents() {
-        List<Student> students = jpaStudentDao.findAllItems();
+        List<Student> students = studentRepository.findAll();
         return getStudentDTOList(students);
     }
 
@@ -50,19 +49,21 @@ public class StudentService {
         }
     }
 
+    @Transactional
     public void addStudent(StudentDTO student) {
         if (isValidStudent(student)) {
-            jpaStudentDao.saveItem(modelMapper.map(student, Student.class));
+            studentRepository.save(modelMapper.map(student, Student.class));
         } else {
             log.error("Invalid student data: First name or last name is empty");
         }
     }
 
+    @Transactional
     public void removeStudentById(int studentId) {
         Optional<StudentDTO> existingStudent = getStudentById(studentId);
 
         if (existingStudent.isPresent()) {
-            jpaStudentDao.deleteItemById(studentId);
+            studentRepository.deleteById(studentId);
         } else {
             throw new NoSuchElementException("Student with ID " + studentId + " not found");
         }

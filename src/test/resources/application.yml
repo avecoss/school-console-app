@@ -9,11 +9,6 @@ spring:
             minimum-idle: 1
             maximum-pool-size: 5
 
-    flyway:
-        locations: classpath:db/migration
-        baselineOnMigrate: true
-        clean-disabled: false
-
     jpa:
         show-sql: true
         properties:
