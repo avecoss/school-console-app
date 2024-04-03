@@ -3,6 +3,9 @@ package dev.alexcoss.service;
 import dev.alexcoss.dto.StudentDTO;
 import dev.alexcoss.model.Student;
 import dev.alexcoss.repository.StudentRepository;
+import dev.alexcoss.util.exceptions.EntityNotExistException;
+import dev.alexcoss.util.exceptions.IllegalStudentException;
+import dev.alexcoss.util.exceptions.NullStudentListException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -10,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -40,22 +42,19 @@ public class StudentService {
 
     @Transactional
     public void addStudents(List<StudentDTO> studentList) {
-        if (isValidStudentList(studentList)) {
-            List<Student> students = studentList.stream()
-                .map(studentDTO -> modelMapper.map(studentDTO, Student.class))
-                .toList();
+        isValidStudentList(studentList);
 
-            studentRepository.saveAllAndFlush(students);
-        }
+        List<Student> students = studentList.stream()
+            .map(studentDTO -> modelMapper.map(studentDTO, Student.class))
+            .toList();
+
+        studentRepository.saveAllAndFlush(students);
     }
 
     @Transactional
     public void addStudent(StudentDTO student) {
-        if (isValidStudent(student)) {
-            studentRepository.save(modelMapper.map(student, Student.class));
-        } else {
-            log.error("Invalid student data: First name or last name is empty");
-        }
+        isValidStudent(student);
+        studentRepository.save(modelMapper.map(student, Student.class));
     }
 
     @Transactional
@@ -65,7 +64,7 @@ public class StudentService {
         if (existingStudent.isPresent()) {
             studentRepository.deleteById(studentId);
         } else {
-            throw new NoSuchElementException("Student with ID " + studentId + " not found");
+            throw new EntityNotExistException("Student with ID " + studentId + " not found");
         }
     }
 
@@ -75,22 +74,19 @@ public class StudentService {
             .toList();
     }
 
-    private boolean isValidStudent(StudentDTO student) {
-        return student != null && student.getFirstName() != null && student.getLastName() != null;
+    private void isValidStudent(StudentDTO student) {
+        if (student != null && student.getFirstName() != null && student.getLastName() != null) {
+            throw new IllegalStudentException("Invalid student data: First name or last name is empty");
+        }
     }
 
-    private boolean isValidStudentList(List<StudentDTO> studentList) {
+    private void isValidStudentList(List<StudentDTO> studentList) {
         if (studentList == null || studentList.isEmpty()) {
-            log.error("Student list is null or empty");
-            return false;
+            throw new NullStudentListException("Student list is null or empty");
         }
 
         for (StudentDTO student : studentList) {
-            if (!isValidStudent(student)) {
-                log.error("Invalid student in the list");
-                return false;
-            }
+            isValidStudent(student);
         }
-        return true;
     }
 }
