@@ -32,12 +32,16 @@ public class StudentService {
 
     public List<StudentDTO> getStudentsByCourse(String courseName) {
         List<Student> students = studentRepository.findByCoursesName(courseName);
-        return getStudentDTOList(students);
+        return students.stream()
+            .map(student -> modelMapper.map(student, StudentDTO.class))
+            .toList();
     }
 
     public List<StudentDTO> getStudents() {
         List<Student> students = studentRepository.findAll();
-        return getStudentDTOList(students);
+        return students.stream()
+            .map(student -> modelMapper.map(student, StudentDTO.class))
+            .toList();
     }
 
     @Transactional
@@ -66,12 +70,6 @@ public class StudentService {
         } else {
             throw new EntityNotExistException("Student with ID " + studentId + " not found");
         }
-    }
-
-    private List<StudentDTO> getStudentDTOList(List<Student> students) {
-        return students.stream()
-            .map(student -> modelMapper.map(student, StudentDTO.class))
-            .toList();
     }
 
     private void isValidStudent(StudentDTO student) {
