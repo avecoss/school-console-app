@@ -1,6 +1,7 @@
 package dev.alexcoss.service;
 
 import dev.alexcoss.dto.GroupDTO;
+import dev.alexcoss.dto.GroupWithStudentCountDTO;
 import dev.alexcoss.model.Group;
 import dev.alexcoss.repository.GroupRepository;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ class GroupServiceTest {
 
     @Test
     public void shouldGetAllGroupsWithStudents() {
-        List<Object[]> groupsWithStudents = getSampleGroupsWithStudents();
+        List<GroupWithStudentCountDTO> groupsWithStudents = getSampleGroupsWithStudents();
         when(groupRepository.findAllGroupsWithStudents()).thenReturn(groupsWithStudents);
 
         Map<GroupDTO, Integer> expectedGroupsDtoWithStudents = getSampleGroupsDtoWithStudents();
@@ -93,10 +94,10 @@ class GroupServiceTest {
         return Arrays.asList(new GroupDTO(1, "Group1"), new GroupDTO(2, "Group2"));
     }
 
-    private List<Object[]> getSampleGroupsWithStudents() {
-        List<Object[]> groupsWithStudents = new ArrayList<>();
-        groupsWithStudents.add(new Object[]{getGroup(1, "Group1"), 10});
-        groupsWithStudents.add(new Object[]{getGroup(2, "Group2"), 15});
+    private List<GroupWithStudentCountDTO> getSampleGroupsWithStudents() {
+        List<GroupWithStudentCountDTO> groupsWithStudents = new ArrayList<>();
+        groupsWithStudents.add(GroupWithStudentCountDTO.builder().group(getGroup(1, "Group1")).studentCount(10).build());
+        groupsWithStudents.add(GroupWithStudentCountDTO.builder().group(getGroup(2, "Group2")).studentCount(15).build());
 
         return groupsWithStudents;
     }

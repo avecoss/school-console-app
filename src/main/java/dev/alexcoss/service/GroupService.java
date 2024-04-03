@@ -1,6 +1,7 @@
 package dev.alexcoss.service;
 
 import dev.alexcoss.dto.GroupDTO;
+import dev.alexcoss.dto.GroupWithStudentCountDTO;
 import dev.alexcoss.model.Group;
 import dev.alexcoss.repository.GroupRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,12 +32,12 @@ public class GroupService {
     }
 
     public Map<GroupDTO, Integer> getAllGroupsWithStudents() {
-        List<Object[]> groupsWithStudents = groupRepository.findAllGroupsWithStudents();
+        List<GroupWithStudentCountDTO> groupsWithStudents = groupRepository.findAllGroupsWithStudents();
 
         return groupsWithStudents.stream()
             .collect(Collectors.toMap(
-                result -> modelMapper.map(result[0], GroupDTO.class),
-                result -> ((Long) result[1]).intValue()
+                group -> modelMapper.map(group.getGroup(), GroupDTO.class),
+                GroupWithStudentCountDTO::getStudentCount
             ));
     }
 
