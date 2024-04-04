@@ -1,7 +1,7 @@
 package dev.alexcoss.service;
 
-import dev.alexcoss.dao.JPAGroupDao;
 import dev.alexcoss.dto.GroupDTO;
+import dev.alexcoss.dto.GroupWithStudentCountDTO;
 import dev.alexcoss.model.Group;
 import dev.alexcoss.repository.GroupRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +17,14 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class GroupService{
+@Transactional(readOnly = true)
+public class GroupService {
 
-    private final JPAGroupDao jpaGroupDao;
     private final GroupRepository groupRepository;
     private final ModelMapper modelMapper;
 
     public List<GroupDTO> getGroups() {
-        List<Group> groups = jpaGroupDao.findAllItems();
+        List<Group> groups = groupRepository.findAll();
 
         return groups.stream()
             .map(group -> modelMapper.map(group, GroupDTO.class))
@@ -32,12 +32,12 @@ public class GroupService{
     }
 
     public Map<GroupDTO, Integer> getAllGroupsWithStudents() {
-        return jpaGroupDao.findAllGroupsWithStudents()
-            .entrySet()
-            .stream()
+        List<GroupWithStudentCountDTO> groupsWithStudents = groupRepository.findAllGroupsWithStudents();
+
+        return groupsWithStudents.stream()
             .collect(Collectors.toMap(
-                entry -> modelMapper.map(entry.getKey(), GroupDTO.class),
-                Map.Entry::getValue
+                group -> modelMapper.map(group.getGroup(), GroupDTO.class),
+                GroupWithStudentCountDTO::getStudentCount
             ));
     }
 

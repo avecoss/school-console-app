@@ -1,7 +1,7 @@
 package dev.alexcoss.service;
 
-import dev.alexcoss.dao.JPAGroupDao;
 import dev.alexcoss.dto.GroupDTO;
+import dev.alexcoss.dto.GroupWithStudentCountDTO;
 import dev.alexcoss.model.Group;
 import dev.alexcoss.repository.GroupRepository;
 import org.junit.jupiter.api.Test;
@@ -18,8 +18,6 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = {GroupService.class, ModelMapper.class})
 class GroupServiceTest {
     @MockBean
-    private JPAGroupDao groupDao;
-    @MockBean
     private GroupRepository groupRepository;
 
     @Autowired
@@ -28,26 +26,26 @@ class GroupServiceTest {
     @Test
     public void shouldGetAllGroups() {
         List<Group> groupEntityList = getSampleGroupEntityList();
-        when(groupDao.findAllItems()).thenReturn(groupEntityList);
+        when(groupRepository.findAll()).thenReturn(groupEntityList);
 
         List<GroupDTO> expectedGroup = getSampleGroupDtoList();
         List<GroupDTO> actualGroups = groupService.getGroups();
 
         assertEquals(expectedGroup.size(), actualGroups.size());
         assertEquals(expectedGroup.get(0).getName(), actualGroups.get(0).getName());
-        verify(groupDao).findAllItems();
+        verify(groupRepository).findAll();
     }
 
     @Test
     public void shouldGetAllGroupsWithStudents() {
-        Map<Group, Integer> groupsWithStudents = getSampleGroupsWithStudents();
-        when(groupDao.findAllGroupsWithStudents()).thenReturn(groupsWithStudents);
+        List<GroupWithStudentCountDTO> groupsWithStudents = getSampleGroupsWithStudents();
+        when(groupRepository.findAllGroupsWithStudents()).thenReturn(groupsWithStudents);
 
         Map<GroupDTO, Integer> expectedGroupsDtoWithStudents = getSampleGroupsDtoWithStudents();
         Map<GroupDTO, Integer> actualGroupsWithStudents = groupService.getAllGroupsWithStudents();
 
         assertEquals(expectedGroupsDtoWithStudents.size(), actualGroupsWithStudents.size());
-        verify(groupDao).findAllGroupsWithStudents();
+        verify(groupRepository).findAllGroupsWithStudents();
     }
 
     @Test
@@ -96,10 +94,10 @@ class GroupServiceTest {
         return Arrays.asList(new GroupDTO(1, "Group1"), new GroupDTO(2, "Group2"));
     }
 
-    private Map<Group, Integer> getSampleGroupsWithStudents() {
-        Map<Group, Integer> groupsWithStudents = new HashMap<>();
-        groupsWithStudents.put(getGroup(1, "Group1"), 10);
-        groupsWithStudents.put(getGroup(2, "Group2"), 15);
+    private List<GroupWithStudentCountDTO> getSampleGroupsWithStudents() {
+        List<GroupWithStudentCountDTO> groupsWithStudents = new ArrayList<>();
+        groupsWithStudents.add(GroupWithStudentCountDTO.builder().group(getGroup(1, "Group1")).studentCount(10).build());
+        groupsWithStudents.add(GroupWithStudentCountDTO.builder().group(getGroup(2, "Group2")).studentCount(15).build());
 
         return groupsWithStudents;
     }

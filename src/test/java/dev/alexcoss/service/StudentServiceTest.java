@@ -1,6 +1,5 @@
 package dev.alexcoss.service;
 
-import dev.alexcoss.dao.JPAStudentDao;
 import dev.alexcoss.dto.StudentDTO;
 import dev.alexcoss.model.Student;
 import dev.alexcoss.repository.StudentRepository;
@@ -18,8 +17,6 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = {StudentService.class, ModelMapper.class})
 class StudentServiceTest {
     @MockBean
-    private JPAStudentDao studentDao;
-    @MockBean
     private StudentRepository studentRepository;
 
     @Autowired
@@ -28,33 +25,33 @@ class StudentServiceTest {
     @Test
     public void shouldGetStudentById() {
         int studentId = 1;
-        when(studentDao.findItemById(studentId)).thenReturn(Optional.of(getStudent(1, "John", "Doe")));
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(getStudent(1, "John", "Doe")));
 
         Optional<StudentDTO> student = studentService.getStudentById(studentId);
 
         assertTrue(student.isPresent());
-        verify(studentDao).findItemById(studentId);
+        verify(studentRepository).findById(studentId);
     }
 
     @Test
     public void shouldGetStudentsByCourse() {
         String courseName = "Math";
-        when(studentDao.findStudentsByCourse(courseName)).thenReturn(getSampleStudentEntityList());
+        when(studentRepository.findByCoursesName(courseName)).thenReturn(getSampleStudentEntityList());
 
         List<StudentDTO> students = studentService.getStudentsByCourse(courseName);
 
         assertNotNull(students);
-        verify(studentDao).findStudentsByCourse(courseName);
+        verify(studentRepository).findByCoursesName(courseName);
     }
 
     @Test
     public void shouldGetAllStudents() {
-        when(studentDao.findAllItems()).thenReturn(getSampleStudentEntityList());
+        when(studentRepository.findAll()).thenReturn(getSampleStudentEntityList());
 
         List<StudentDTO> students = studentService.getStudents();
 
         assertNotNull(students);
-        verify(studentDao).findAllItems();
+        verify(studentRepository).findAll();
     }
 
     @Test
@@ -92,7 +89,7 @@ class StudentServiceTest {
         StudentDTO validStudent = StudentDTO.builder().id(1).firstName("John").lastName("Doe").build();
         studentService.addStudent(validStudent);
 
-        verify(studentDao, times(1)).saveItem(getStudent(1, "John", "Doe"));
+        verify(studentRepository, times(1)).save(getStudent(1, "John", "Doe"));
     }
 
     @Test
@@ -100,28 +97,28 @@ class StudentServiceTest {
         StudentDTO invalidStudent = new StudentDTO();
         studentService.addStudent(invalidStudent);
 
-        verify(studentDao, never()).saveItem(any());
+        verify(studentRepository, never()).save(any());
     }
 
     @Test
     public void shouldRemoveExistingStudentById() {
         int existingStudentId = 1;
-        when(studentDao.findItemById(existingStudentId)).thenReturn(Optional.of(getStudent(1, "John", "Doe")));
+        when(studentRepository.findById(existingStudentId)).thenReturn(Optional.of(getStudent(1, "John", "Doe")));
 
         studentService.removeStudentById(existingStudentId);
 
-        verify(studentDao, times(1)).deleteItemById(existingStudentId);
+        verify(studentRepository, times(1)).deleteById(existingStudentId);
     }
 
     @Test
     public void shouldNotRemoveNonExistingStudentById() {
         int nonExistingStudentId = 99;
-        when(studentDao.findItemById(nonExistingStudentId)).thenReturn(Optional.empty());
+        when(studentRepository.findById(nonExistingStudentId)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> {
             studentService.removeStudentById(nonExistingStudentId);
         });
-        verify(studentDao, never()).deleteItemById(nonExistingStudentId);
+        verify(studentRepository, never()).deleteById(nonExistingStudentId);
     }
 
     private Student getStudent(int id, String firstName, String lastName) {

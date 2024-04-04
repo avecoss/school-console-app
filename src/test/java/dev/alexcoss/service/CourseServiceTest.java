@@ -1,6 +1,5 @@
 package dev.alexcoss.service;
 
-import dev.alexcoss.dao.JPACourseDao;
 import dev.alexcoss.dto.CourseDTO;
 import dev.alexcoss.model.Course;
 import dev.alexcoss.repository.CourseRepository;
@@ -19,8 +18,6 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = {CourseService.class, ModelMapper.class})
 class CourseServiceTest {
     @MockBean
-    private JPACourseDao courseDao;
-    @MockBean
     private CourseRepository courseRepository;
 
     @Autowired
@@ -29,14 +26,14 @@ class CourseServiceTest {
     @Test
     void shouldGetAllCourses() {
         List<Course> entityCourses = getSampleCourseEntityList();
-        when(courseDao.findAllItems()).thenReturn(entityCourses);
+        when(courseRepository.findAll()).thenReturn(entityCourses);
 
         List<CourseDTO> expectedCourses = getSampleCourseDtoList();
         List<CourseDTO> actualCourses = courseService.getCourses();
 
         assertEquals(expectedCourses.size(), actualCourses.size());
         assertEquals(expectedCourses.get(0).getName(), actualCourses.get(0).getName());
-        verify(courseDao).findAllItems();
+        verify(courseRepository).findAll();
     }
 
     @Test

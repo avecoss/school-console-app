@@ -1,6 +1,5 @@
 package dev.alexcoss.service;
 
-import dev.alexcoss.dao.JPACourseDao;
 import dev.alexcoss.dto.CourseDTO;
 import dev.alexcoss.model.Course;
 import dev.alexcoss.repository.CourseRepository;
@@ -15,14 +14,14 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CourseService {
 
-    private final JPACourseDao jpaCourseDao;
     private final CourseRepository courseRepository;
     private final ModelMapper modelMapper;
 
     public List<CourseDTO> getCourses() {
-        List<Course> courses = jpaCourseDao.findAllItems();
+        List<Course> courses = courseRepository.findAll();
 
         return courses.stream()
             .map(course -> modelMapper.map(course, CourseDTO.class))
