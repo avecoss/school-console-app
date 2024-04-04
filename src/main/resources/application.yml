@@ -2,14 +2,14 @@
 spring:
     datasource:
         driver-class-name: org.postgresql.Driver
-        url: jdbc:postgresql://localhost:5432/school_database
-        username: school_admin
-        password: 1111
+        url: jdbc:postgresql://localhost:5432/your_database_name
+        username: your_username
+        password: your_password
 
     flyway:
-        url: jdbc:postgresql://localhost:5432/school_database
-        user: school_admin
-        password: 1111
+        url: jdbc:postgresql://localhost:5432/your_database_name
+        user: your_username
+        password: your_password
         locations: db/migration
         baselineOnMigrate: true
         baselineVersion: 1
